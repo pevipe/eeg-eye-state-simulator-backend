@@ -1,3 +1,5 @@
+import numpy as np
+
 
 class Window:
     def __init__(self, global_data, start_time, end_time, fs):
@@ -18,4 +20,10 @@ class Window:
 
         return data[ini:fin]
 
-    
+    def __str__(self):
+        mean_O1 = str(round(np.mean(self.data_O1[0]), 4))
+        mean_O2 = str(round(np.mean(self.data_O2[0]), 4))
+        mean_targets = str(round(np.mean(self.data_O1[1]), 1))
+
+        return ("Time: " + str(self.start_time) + " - " + str(self.end_time) + " s. O1: " + mean_O1 + " O2: " +
+                mean_O2 + ". State: " + mean_targets + ".")

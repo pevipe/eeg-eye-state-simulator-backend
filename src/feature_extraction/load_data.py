@@ -12,6 +12,11 @@ def load_csv(file):
     return data
 
 
+def normalize(unnormalized_data):
+    normalized = unnormalized_data[:, 0:2] - np.mean(unnormalized_data[:, 0:2])
+    return np.append(normalized, unnormalized_data[:, 2].reshape(-1, 1), axis=1)
+
+
 # Generates n windows of size window_size from the data
 def all_windowing(total_data, total_time):
     n = floor(total_time / window_size)
@@ -19,8 +24,8 @@ def all_windowing(total_data, total_time):
     windows_list = []
 
     for i in range(n):
-        start_time = i * window_size * fs
-        end_time = (i + 1) * window_size * fs
+        start_time = i * window_size
+        end_time = (i + 1) * window_size
         windows_list.append(Window(total_data, start_time, end_time, fs))
 
     return windows_list
@@ -34,8 +39,9 @@ if __name__ == '__main__':
 
     for f in files:
         data = load_csv(dataset_path+"/"+f)
-        data = data - np.mean(data)
+        data = normalize(data)
         total_time = 600
         windows = windows + all_windowing(data, total_time)
 
-    print(len(windows))
+    # for w in windows:
+    #     print(w)
