@@ -11,8 +11,10 @@ class Window:
 
         targets = self.windowing(global_data[:, 2])
 
-        self.data_O1 = [self.windowing(global_data[:, 0]), targets]
-        self.data_O2 = [self.windowing(global_data[:, 1]), targets]
+        # Sensor data and targets
+        self.data_O1 = self.windowing(global_data[:, 0])
+        self.data_O2 = self.windowing(global_data[:, 1])
+        self.mean_targets = np.mean(targets)
 
     def windowing(self, data):
         ini = self.start_time * self.fs
@@ -21,9 +23,9 @@ class Window:
         return data[ini:fin]
 
     def __str__(self):
-        mean_O1 = str(round(np.mean(self.data_O1[0]), 4))
-        mean_O2 = str(round(np.mean(self.data_O2[0]), 4))
-        mean_targets = str(round(np.mean(self.data_O1[1]), 1))
+        mean_O1 = str(round(np.mean(self.data_O1), 4))
+        mean_O2 = str(round(np.mean(self.data_O2), 4))
+        mean_targets = str(round(self.mean_targets, 2))
 
         return ("Time: " + str(self.start_time) + " - " + str(self.end_time) + " s. O1: " + mean_O1 + " O2: " +
                 mean_O2 + ". State: " + mean_targets + ".")
