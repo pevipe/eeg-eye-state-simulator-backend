@@ -2,8 +2,9 @@ import numpy as np
 from math import floor
 import os
 
+from src.feature_extraction.rates import Rate
 from window import Window
-from constants import dataset_path, fs, window_size
+from constants import dataset_path, fs, window_size, alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
 
 
 def load_csv(file):
@@ -18,30 +19,35 @@ def normalize(unnormalized_data):
 
 
 # Generates n windows of size window_size from the data
-def all_windowing(total_data, total_time):
-    n = floor(total_time / window_size)
+def all_windowing(total_data, total_time, win_size):
+    n = floor(total_time / win_size)
 
     windows_list = []
 
     for i in range(n):
-        start_time = i * window_size
-        end_time = (i + 1) * window_size
+        start_time = i * win_size
+        end_time = (i + 1) * win_size
         windows_list.append(Window(total_data, start_time, end_time, fs))
 
     return windows_list
 
 
-if __name__ == '__main__':
+# Performs all necessary operations to transform csv into entries for a classificator (rates and target)
+def load_dataset(win_size):
     files = [f for f in os.listdir(dataset_path) if f.endswith(".csv")]
-    fs = 200
-    window_size = 10
-    windows = []
 
+    windows = []
     for f in files:
-        data = load_csv(dataset_path+"/"+f)
+        data = load_csv(dataset_path + "/" + f)
         data = normalize(data)
         total_time = 600
-        windows = windows + all_windowing(data, total_time)
+        windows = windows + all_windowing(data, total_time, win_size)
 
-    # for w in windows:
-    #     print(w)
+    dataset = []
+    for w in windows:
+        dataset.append(Rate(w, alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut, fs).to_classificator_entry())
+    return dataset
+
+
+if __name__ == '__main__':
+    load_dataset(window_size)
