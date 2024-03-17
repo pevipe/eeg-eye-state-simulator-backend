@@ -3,8 +3,8 @@ from math import floor
 import os
 
 from src.feature_extraction.rates import Rate
-from window import Window
-from constants import dataset_path, fs, window_size, alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
+from src.feature_extraction.window import Window
+from src.feature_extraction.constants import dataset_path, fs, window_size, alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
 
 
 def load_csv(file):
@@ -46,7 +46,7 @@ def load_dataset(win_size):
     dataset = []
     for w in windows:
         dataset.append(Rate(w, alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut, fs).to_classificator_entry())
-    return dataset
+    return np.array(dataset)
 
 
 if __name__ == '__main__':
