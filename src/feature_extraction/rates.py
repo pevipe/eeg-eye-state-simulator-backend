@@ -47,5 +47,7 @@ class Rate:
         return ("Rates for window on period " + str(self.window.start_time) + "s to " + str(self.window.end_time) +
                 "s is: O1 = " + o1 + ", O2 = " + o2)
 
-    def to_classificator_entry(self):
+    def to_classificator_entry(self, exact_targets=False):
+        if exact_targets:
+            return [self.rate_O1, self.rate_O2, self.window.mean_targets]
         return [self.rate_O1, self.rate_O2, np.round(self.window.mean_targets)]
