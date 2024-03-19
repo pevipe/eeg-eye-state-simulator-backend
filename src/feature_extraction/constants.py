@@ -1,4 +1,4 @@
-dataset_path = "../../data/dataset_1"
+dataset_path = "../data/dataset_1"
 fs = 200
 window_size = 10
 alpha_lowcut = 7.0

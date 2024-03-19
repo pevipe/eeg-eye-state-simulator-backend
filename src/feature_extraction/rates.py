@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-from window import Window
+from src.feature_extraction.window import Window
 
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
@@ -47,5 +47,7 @@ class Rate:
         return ("Rates for window on period " + str(self.window.start_time) + "s to " + str(self.window.end_time) +
                 "s is: O1 = " + o1 + ", O2 = " + o2)
 
-    def to_classificator_entry(self):
-        return [self.rate_O1, self.rate_O2, self.window.mean_targets]
+    def to_classificator_entry(self, exact_targets=False):
+        if exact_targets:
+            return [self.rate_O1, self.rate_O2, self.window.mean_targets]
+        return [self.rate_O1, self.rate_O2, np.round(self.window.mean_targets)]
