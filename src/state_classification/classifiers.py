@@ -75,3 +75,18 @@ class TestClassifiers:
             scores = cross_val_score(classifier, self.x, self.y, cv=self.kfold)
             self.scores.append((name, scores))
 
+    def save_results(self, route, synthetized=True, description=""):
+        with open(route, 'w') as f:
+            f.write(description + "\n")
+            if synthetized:
+                f.write("classifier,mean_accuracy,std_accuracy\n")
+                for name, results in self.scores:
+                    f.write(name + "," + str(results.mean()) + "," + str(results.std()) + "\n")
+            else:
+                f.write("classifier,1,2,3,4,5,6,7,8,9,10,mean_accuracy,std_accuracy\n")
+                for name, results in self.scores:
+                    f.write(name + ",")
+                    for fold_accuracy in results:
+                        f.write(str(fold_accuracy) + ",")
+                    f.write(str(results.mean()) + "," + str(results.std()) + "\n")
+        f.close()
