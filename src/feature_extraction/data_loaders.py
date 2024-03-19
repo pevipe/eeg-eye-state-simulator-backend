@@ -1,5 +1,4 @@
 import numpy as np
-from math import floor
 import os
 
 from src.feature_extraction.rates import Rate
@@ -29,15 +28,15 @@ class DataLoader:
         return np.append(normalized, unnormalized_data[:, 2].reshape(-1, 1), axis=1)
 
     @staticmethod
-    def _all_windowing(total_data, total_time, win_size, fs):
-        n = floor(total_time / win_size)
-
+    def _all_windowing(total_data, total_time, win_size, fs, overlap=0):
         windows_list = []
+        start_time = 0
+        end_time = win_size
 
-        for i in range(n):
-            start_time = i * win_size
-            end_time = (i + 1) * win_size
+        while end_time <= total_time:
             windows_list.append(Window(total_data, start_time, end_time, fs))
+            start_time = start_time + win_size - overlap
+            end_time = start_time + win_size
 
         return windows_list
 
@@ -94,4 +93,52 @@ class DHBWDatasetLoader(DataLoader):
             dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                                 self.fs).to_classificator_entry(exact_targets))
         self.dataset = np.array(dataset)
+        return self.dataset
+
+
+class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
+    def __init__(self, dataset_path, fs, win_size):
+        super().__init__(dataset_path, fs, win_size)
+        self.dataset = None
+
+    def load_all_datasets(self, overlap=0, exact_targets=False):
+        """
+            Load the datasets from each individual subject. Returns the list with the datasets.
+            Windowing is now done with overlapping, sliding the time window each 2 seconds.
+        """
+        self.dataset = []  # Clear the dataset in case it contained something
+        files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
+
+        for f in files:
+            data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
+            data = self._normalize(data)
+            # Take the samples with overlapping (sliding time window each 2 seconds)
+            total_time = 600
+            windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
+
+            dataset = []
+            for w in windows:
+                dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                                    self.fs).to_classificator_entry(exact_targets))
+            self.dataset.append(np.array(dataset))
+
+        return self.dataset
+
+    def load_single_dataset(self, subject_number, overlap=0, exact_targets=False):
+        self.dataset = None  # Clear the dataset in case it contained something
+
+        # Load the individual subject specified
+        data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/Sujeto_" + str(subject_number) + ".csv")
+        data = self._normalize(data)
+
+        # Take the samples with overlapping (sliding time window each 2 seconds)
+        total_time = 600
+        windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
+
+        dataset = []
+        for w in windows:
+            dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                                self.fs).to_classificator_entry(exact_targets))
+        self.dataset = np.array(dataset)
+
         return self.dataset
