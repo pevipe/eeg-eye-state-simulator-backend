@@ -2,7 +2,7 @@ from src.feature_extraction.data_loaders import ProvidedDatasetLoader, DHBWDatas
     ProvidedDatasetIndividualLoader
 from src.feature_extraction.constants import window_size
 from src.state_classification.classifiers import TestClassifiers
-
+from src.state_classification.hyperparameter_optimization import TestOptimizedClassifiers
 
 def do_dataset_1():
     # Load first dataset
@@ -52,5 +52,21 @@ def do_dataset_1_one_at_a_time():
         print(all_classifiers, end="\n\n")
 
 
+def do_dataset_1_one_at_a_time_optimized():
+    # Load datasets from individual subjects
+    provided_dataset_individual_loader = ProvidedDatasetIndividualLoader("../data/dataset_1", 200, window_size)
+    provided_dataset_individual_loader.load_all_datasets(overlap=8)
+    provided_datasets_individual = provided_dataset_individual_loader.dataset
+
+    print("**************************\n" +
+          "* DATASET 1 (individual) *\n" +
+          "**************************\n")
+    for i, dataset in enumerate(provided_datasets_individual):
+        optimized_classifiers = TestOptimizedClassifiers(dataset)
+        optimized_classifiers.try_all()
+        optimized_classifiers.save_results("../out/results/individual/subject_" + str(i + 1) + "_optimized.csv",
+                                           description="Results from subject " + str(i + 1) + " with optimized hyperparameters")
+
+
 if __name__ == '__main__':
-    do_dataset_1_one_at_a_time()
+    do_dataset_1_one_at_a_time_optimized()

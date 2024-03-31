@@ -142,3 +142,12 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         self.dataset = np.array(dataset)
 
         return self.dataset
+
+    def export_dataset(self, route):
+        # Create the directory if it does not exist
+        if not os.path.exists(route):
+            os.makedirs(route)
+
+        # Save the dataset to CSV files
+        for i, dataset in enumerate(self.dataset):
+            np.savetxt(route + "/subject_" + str(i + 1) + ".csv", dataset, delimiter=",")
