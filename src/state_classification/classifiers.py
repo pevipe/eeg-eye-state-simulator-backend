@@ -1,11 +1,25 @@
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+import numpy as np
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
+from scipy import stats
 
 from sklearn.model_selection import KFold, cross_val_score
+
+classifier_dict = {'AB': AdaBoostClassifier(learning_rate=0.0645050649100435, n_estimators=30,
+                                            random_state=3),
+                   'DT': DecisionTreeClassifier(),
+                   'KNN': KNeighborsClassifier(),
+                   'LDA': LinearDiscriminantAnalysis(),
+                   'LR': LogisticRegression(),
+                   'RF': RandomForestClassifier(),
+                   'QDA': QuadraticDiscriminantAnalysis(),
+                   'SVM': SVC(C=1.2747788661328625, coef0=0.00425697976468159, random_state=0,
+                              shrinking=False, tol=1.1901693317508151e-05)
+                   }
 
 
 class Classifier:
@@ -42,43 +56,44 @@ class Classifier:
         self.scores = cross_val_score(self.classifier, self.x, self.y, cv=self.kfold)
 
 
-class TestClassifiers:
-    def __init__(self, dataset):
+class AllClassifiers:
+    def __init__(self, dataset, n_folds=10):
         # Set inputs and targets of classifiers
         self.x = dataset[:, 0:2]
         self.y = dataset[:, 2]
 
         # Set kfold and list of classiffiers
-        self.kfold = KFold(n_splits=10, shuffle=True, random_state=0)
-        self.classifiers = [
-            ('LR', LogisticRegression()),
-            ('KNN', KNeighborsClassifier()),
-            ('CART', DecisionTreeClassifier()),
-            ('LDA', LinearDiscriminantAnalysis()),
-            ('NB', GaussianNB()),
-            ('SVM', SVC(gamma='auto'))
-        ]
+        self.kfold = KFold(n_splits=n_folds, shuffle=True, random_state=0)
+        self.classifiers = classifier_dict
+
+        # Set empty list of scores
         self.scores = []
 
     def __str__(self):
         if not self.scores:
             return "Classifier has not been executed yet"
-        result = ""
+        result = ("##############################\n"
+                  "# Results of all classifiers #\n"
+                  "##############################\n")
         for name, results in self.scores:
             result += (name + "\nCross-validation scores: " + str(results)
                        + "\nAverage accuracy: " + str(results.mean())
                        + "\nStandard deviation: " + str(results.std()) + "\n\n")
         return result
 
-    def classify(self):
-        for name, classifier in self.classifiers:
-            scores = cross_val_score(classifier, self.x, self.y, cv=self.kfold)
+    def preprocess(self):
+        self.x = np.array([stats.zscore(self.x[:, 0]), stats.zscore(self.x[:, 1])]).T
+
+    def classify(self, preprocess=False):
+        self.preprocess() if preprocess else None
+        for name in self.classifiers.keys():
+            scores = cross_val_score(self.classifiers[name], self.x, self.y, cv=self.kfold)
             self.scores.append((name, scores))
 
-    def save_results(self, route, synthetized=True, description=""):
+    def save_results(self, route, synthesized=True, description=""):
         with open(route, 'w') as f:
             f.write(description + "\n")
-            if synthetized:
+            if synthesized:
                 f.write("classifier,mean_accuracy,std_accuracy\n")
                 for name, results in self.scores:
                     f.write(name + "," + str(results.mean()) + "," + str(results.std()) + "\n")

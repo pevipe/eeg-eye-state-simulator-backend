@@ -1,7 +1,7 @@
 from src.feature_extraction.data_loaders import ProvidedDatasetLoader, DHBWDatasetLoader, \
     ProvidedDatasetIndividualLoader
 from src.feature_extraction.constants import window_size
-from src.state_classification.classifiers import TestClassifiers
+from src.state_classification.classifiers import AllClassifiers
 
 
 def do_dataset_1():
@@ -14,7 +14,7 @@ def do_dataset_1():
     print("*****************\n" +
           "*** DATASET 1 ***\n" +
           "*****************\n")
-    all_classifiers = TestClassifiers(provided_dataset)
+    all_classifiers = AllClassifiers(provided_dataset)
     all_classifiers.classify()
     print(all_classifiers, end="\n\n")
 
@@ -29,7 +29,7 @@ def do_dataset_2():
     print("*****************\n" +
           "*** DATASET 2 ***\n" +
           "*****************\n")
-    all_classifiers = TestClassifiers(dhbw_dataset)
+    all_classifiers = AllClassifiers(dhbw_dataset)
     all_classifiers.classify()
     print(all_classifiers)
 
@@ -45,10 +45,11 @@ def do_dataset_1_one_at_a_time():
           "* DATASET 1 (individual) *\n" +
           "**************************\n")
     for i, dataset in enumerate(provided_datasets_individual):
-        all_classifiers = TestClassifiers(dataset)
+        all_classifiers = AllClassifiers(dataset)
+        all_classifiers.preprocess()
         all_classifiers.classify()
         all_classifiers.save_results("../out/results/individual/subject_" + str(i + 1) + "_complete.csv",
-                                     synthetized=False, description="Results from subject " + str(i + 1))
+                                     synthesized=False, description="Results from subject " + str(i + 1))
         print("Subject " + str(i + 1) + ":")
         print(all_classifiers, end="\n\n")
 
