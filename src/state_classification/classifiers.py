@@ -105,3 +105,28 @@ class AllClassifiers:
                         f.write(str(fold_accuracy) + ",")
                     f.write(str(results.mean()) + "," + str(results.std()) + "\n")
         f.close()
+
+
+class CustomizedClassifiers(AllClassifiers):
+    def __init__(self, dataset, customization_path, n_subject=None, n_folds=10):
+        super().__init__(dataset, n_folds)
+        self.n_subject = n_subject
+        self.customization_path = customization_path
+
+        # Allow to take the classifiers with customized hyperparameter optimization
+        if n_subject is not None and 0 < n_subject <= len(classifiers_per_subject):
+            self.get_classifiers()
+        else:
+            print("No classifiers optimized for this subject. Using default hyperparameters.")
+            self.classifiers = classifier_dict
+
+        self.scores = []
+
+    def get_classifiers(self):
+        # csv will have: subject,classifier_name,string of classifier to create
+        # Open a csv file and read the hyperparameters for each classifier
+        data = np.loadtxt(self.customization_path, "rb", delimiter=",", skiprows=1)
+        data = data[1:, :]  # From second row to the end
+        classifiers = data[data[:, 0] == self.n_subject][:, 1:]
+        for name, declaration in classifiers:
+            self.classifiers[name] = eval(declaration)
