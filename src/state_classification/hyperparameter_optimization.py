@@ -70,8 +70,8 @@ class ClassifierOptimization:
                     f.truncate()
                     f.write("subject;classifier;model;preprocessing;accuracy\n")
                 for name, accuracy, model in self.scores:
-                    f.write(str(self.n_subject) + ";" + name + ";" + str(model['learner']) +
-                            ";" + str(model['preprocs']) + ";" + str(round(accuracy, 3)) + "\n")
+                    f.write((str(self.n_subject) + ";" + name + ";" + str(model['learner']) +
+                            ";" + str(model['preprocs']) + ";" + str(round(accuracy, 3)) + "\n").replace("\n   ", ""))
             else:
                 if f.readline().startswith("classifier"):
                     f.seek(0, 2)

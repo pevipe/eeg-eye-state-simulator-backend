@@ -64,7 +64,7 @@ def do_dataset_1_one_at_a_time_optimized():
     for i, dataset in enumerate(provided_datasets_individual):
         optimized_classifiers = ClassifierOptimization(dataset, n_subject=i+1)
         optimized_classifiers.try_all()
-        optimized_classifiers.save_results("../out/results/opt_hyperopt/subject_" + str(i + 1) + "_optimized.csv")
+        optimized_classifiers.save_results("../out/results/opt_hyperopt/optimized_hyperparameters.csv")
 
 
 if __name__ == '__main__':
