@@ -97,9 +97,10 @@ class DHBWDatasetLoader(DataLoader):
 
 
 class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
-    def __init__(self, dataset_path, fs, win_size):
+    def __init__(self, dataset_path, output_path, fs, win_size):
         super().__init__(dataset_path, fs, win_size)
         self.dataset = None
+        self.output_path = output_path
 
     def load_all_datasets(self, overlap=0, exact_targets=False):
         """
@@ -109,6 +110,17 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         self.dataset = []  # Clear the dataset in case it contained something
         files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
 
+        # Check if the datasets have already been calculated
+        if os.path.exists(self.output_path):
+            out_files = [f for f in os.listdir(self.output_path) if f.endswith(".csv")]
+            if len(out_files) == len(files):
+                # Load the dataset that had already been calculated
+                for f in out_files:
+                    self.dataset.append(np.loadtxt(open(self.output_path + "/" + f, "rb"), delimiter=","))
+                print("Datasets loaded from the output path.")
+                return self.dataset
+
+        # If not, calculate the datasets and export them so then can be imported later
         for f in files:
             data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
             data = self._normalize(data)
@@ -121,6 +133,9 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
                 dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                                     self.fs).to_classificator_entry(exact_targets))
             self.dataset.append(np.array(dataset))
+
+        # Export the datasets so that time can be saved next time
+        self.export_datasets()
 
         return self.dataset
 
@@ -143,7 +158,9 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
 
         return self.dataset
 
-    def export_dataset(self, route):
+    def export_datasets(self, route=None):
+        if route is None:
+            route = self.output_path
         # Create the directory if it does not exist
         if not os.path.exists(route):
             os.makedirs(route)
@@ -151,3 +168,5 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         # Save the dataset to CSV files
         for i, dataset in enumerate(self.dataset):
             np.savetxt(route + "/subject_" + str(i + 1) + ".csv", dataset, delimiter=",")
+
+        print("Datasets exported to the output path.")

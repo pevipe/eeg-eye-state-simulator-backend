@@ -6,13 +6,13 @@ from hpsklearn import (svc, decision_tree_classifier, k_neighbors_classifier, ra
                        linear_discriminant_analysis, ada_boost_classifier)
 
 classifier_dict = {
-    # 'AdaBoost': ada_boost_classifier('abc'),
-    # 'DecisionTree': decision_tree_classifier('dtc'),
-    # 'KNN': k_neighbors_classifier('knc'),
-    # 'LDA': linear_discriminant_analysis('lda'),
+    'AdaBoost': ada_boost_classifier('abc'),
+    'DecisionTree': decision_tree_classifier('dtc'),
+    'KNN': k_neighbors_classifier('knc'),
+    'LDA': linear_discriminant_analysis('lda'),
     # 'LogisticRegression': TODO: DELETE
-    # 'RandomForest': random_forest_classifier('rfc'),
-    # 'QDA': quadratic_discriminant_analysis('qda'),
+    'RandomForest': random_forest_classifier('rfc'),
+    'QDA': quadratic_discriminant_analysis('qda'),
     'SVM': svc('svc'),
 }
 
