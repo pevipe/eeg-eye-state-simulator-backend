@@ -52,13 +52,14 @@ class ProvidedDatasetLoader(DataLoader):
         data = data[:, 1:4]
         return data
 
-    def load_dataset(self, exact_targets=False):
+    def load_dataset(self, exact_targets=False, normalize=False):
         files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
 
         windows = []
         for f in files:
             data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
-            data = self._normalize(data)
+            if normalize:
+                data = self._normalize(data)
             total_time = 600
             windows = windows + self._all_windowing(data, total_time, self.window_size, self.fs)
 
@@ -82,9 +83,10 @@ class DHBWDatasetLoader(DataLoader):
         data = data[:, [6, 7, 14]]
         return data
 
-    def load_dataset(self, exact_targets=False):
+    def load_dataset(self, exact_targets=False, normalize=False):
         data = DHBWDatasetLoader._load_csv(self.dataset_path)
-        data = self._normalize(data)
+        if normalize:
+            data = self._normalize(data)
 
         windows = self._all_windowing(data, self.total_time, self.window_size, self.fs)
 
@@ -102,7 +104,7 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         self.dataset = None
         self.output_path = output_path
 
-    def load_all_datasets(self, overlap=0, exact_targets=False):
+    def load_all_datasets(self, overlap=0, exact_targets=False, normalize=False):
         """
             Load the datasets from each individual subject. Returns the list with the datasets.
             Windowing is now done with overlapping, sliding the time window each 2 seconds.
@@ -123,7 +125,8 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         # If not, calculate the datasets and export them so then can be imported later
         for f in files:
             data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
-            data = self._normalize(data)
+            if normalize:
+                data = self._normalize(data)
             # Take the samples with overlapping (sliding time window each 2 seconds)
             total_time = 600
             windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
@@ -139,12 +142,13 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
 
         return self.dataset
 
-    def load_single_dataset(self, subject_number, overlap=0, exact_targets=False):
+    def load_single_dataset(self, subject_number, overlap=0, exact_targets=False, normalize=False):
         self.dataset = None  # Clear the dataset in case it contained something
 
         # Load the individual subject specified
         data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/Sujeto_" + str(subject_number) + ".csv")
-        data = self._normalize(data)
+        if normalize:
+            data = self._normalize(data)
 
         # Take the samples with overlapping (sliding time window each 2 seconds)
         total_time = 600
