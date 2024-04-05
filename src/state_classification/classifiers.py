@@ -14,7 +14,7 @@ classifier_dict = {'AB': AdaBoostClassifier(learning_rate=0.0645050649100435, n_
                    'DT': DecisionTreeClassifier(),
                    'KNN': KNeighborsClassifier(),
                    'LDA': LinearDiscriminantAnalysis(),
-                   'LR': LogisticRegression(),
+                   # 'LR': LogisticRegression(),
                    'RF': RandomForestClassifier(),
                    'QDA': QuadraticDiscriminantAnalysis(),
                    'SVM': SVC(C=1.2747788661328625, coef0=0.00425697976468159, random_state=0,
@@ -78,9 +78,11 @@ class CustomizedClassifiers(AllClassifiers):
         super().__init__(dataset, n_folds)
         self.n_subject = n_subject
         self.customization_path = customization_path
+        self.classifiers = {}
+        self.preprocessers = {}
 
         # Allow to take the classifiers with customized hyperparameter optimization
-        if n_subject is not None and 0 < n_subject <= len(classifiers_per_subject):
+        if n_subject is not None and 0 < n_subject:
             self.get_classifiers()
         else:
             print("No classifiers optimized for this subject. Using default hyperparameters.")
@@ -89,10 +91,14 @@ class CustomizedClassifiers(AllClassifiers):
         self.scores = []
 
     def get_classifiers(self):
-        # csv will have: subject,classifier_name,string of classifier to create
+        # csv will have: subject,classifier_name,classifier_init,preprocess_init,accuracy
         # Open a csv file and read the hyperparameters for each classifier
-        data = np.loadtxt(self.customization_path, "rb", delimiter=",", skiprows=1)
-        data = data[1:, :]  # From second row to the end
-        classifiers = data[data[:, 0] == self.n_subject][:, 1:]
-        for name, declaration in classifiers:
-            self.classifiers[name] = eval(declaration)
+        data = np.loadtxt(self.customization_path, dtype=str, delimiter=";", skiprows=1, usecols=(0, 1, 2, 3))
+        # each row of data has the following shape: [model_name, model_init, preprocess_init]
+        models_for_this_subject = data[data[:, 0] == str(self.n_subject)][:, 1:]  # Get the models for this subject
+        for (name, classifier, preprocesser) in models_for_this_subject:
+            print(name)
+            print(classifier)
+            print(preprocesser, end="\n\n")
+            self.classifiers[name] = eval(classifier)
+            self.preprocessers[name] = eval(preprocesser)  # TODO: import all necessary classes from sklearn
