@@ -2,7 +2,7 @@ from src.feature_extraction.data_loaders import ProvidedDatasetLoader, DHBWDatas
     ProvidedDatasetIndividualLoader
 from src.feature_extraction.constants import window_size
 from src.state_classification.classifiers import TestClassifiers
-from src.state_classification.hyperparameter_optimization import TestOptimizedClassifiers
+from src.state_classification.hyperparameter_optimization import ClassifierOptimization
 
 def do_dataset_1():
     # Load first dataset
@@ -62,10 +62,9 @@ def do_dataset_1_one_at_a_time_optimized():
           "* DATASET 1 (individual) *\n" +
           "**************************\n")
     for i, dataset in enumerate(provided_datasets_individual):
-        optimized_classifiers = TestOptimizedClassifiers(dataset)
+        optimized_classifiers = ClassifierOptimization(dataset, n_subject=i+1)
         optimized_classifiers.try_all()
-        optimized_classifiers.save_results("../out/results/individual/subject_" + str(i + 1) + "_optimized.csv",
-                                           description="Results from subject " + str(i + 1) + " with optimized hyperparameters")
+        optimized_classifiers.save_results("../out/results/opt_hyperopt/subject_" + str(i + 1) + "_optimized.csv")
 
 
 if __name__ == '__main__':

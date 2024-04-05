@@ -1,15 +1,24 @@
-# example of hyperopt-sklearn for the sonar classification dataset
-from pandas import read_csv
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from hpsklearn import HyperoptEstimator, any_classifier, any_preprocessing
+from hpsklearn import HyperoptEstimator, any_preprocessing, quadratic_discriminant_analysis
 from hyperopt import tpe
-from hpsklearn import (svc, decision_tree_classifier, k_neighbors_classifier, random_forest_classifier, linear_svc,
-                       linear_discriminant_analysis, ada_boost_classifier, gradient_boosting_classifier)
+from hpsklearn import (svc, decision_tree_classifier, k_neighbors_classifier, random_forest_classifier,
+                       linear_discriminant_analysis, ada_boost_classifier)
+
+classifier_dict = {
+    # 'AdaBoost': ada_boost_classifier('abc'),
+    # 'DecisionTree': decision_tree_classifier('dtc'),
+    # 'KNN': k_neighbors_classifier('knc'),
+    # 'LDA': linear_discriminant_analysis('lda'),
+    # 'LogisticRegression': TODO: DELETE
+    # 'RandomForest': random_forest_classifier('rfc'),
+    # 'QDA': quadratic_discriminant_analysis('qda'),
+    'SVM': svc('svc'),
+}
 
 
-class TestOptimizedClassifiers:
-    def __init__(self, dataset):
+class ClassifierOptimization:
+    def __init__(self, dataset, n_subject=None):
         # Set inputs and targets of classifiers
         self.x = dataset[:, 0:2].astype('float32')
         self.y = LabelEncoder().fit_transform(dataset[:, 2].astype('str'))
@@ -17,17 +26,9 @@ class TestOptimizedClassifiers:
                                                                                 random_state=1)
 
         # Set list of classiffiers
-        self.classifiers = {
-            'AdaBoost': ada_boost_classifier('abc'),
-            'DecisionTree': decision_tree_classifier('dtc'),
-            'GradientBoosting': gradient_boosting_classifier('gbc'),
-            'KNeighbors': k_neighbors_classifier('knc'),
-            'LinearSVC': linear_svc('lsvc'),
-            'LinearDiscriminantAnalysis': linear_discriminant_analysis('lda'),
-            'RandomForest': random_forest_classifier('rfc'),
-            'SVC': svc('svc')
-        }
+        self.classifiers = classifier_dict
         self.scores = []
+        self.n_subject = n_subject
 
     def try_all(self):
         for name in self.classifiers.keys():
@@ -57,11 +58,27 @@ class TestOptimizedClassifiers:
         print("Accuracy: " + str(acc), end="\n\n")
         self.scores.append((name, acc, model.best_model()))
 
-    def save_results(self, file, description=None):
-        with open(file, "w") as f:
-            if description is not None:
-                f.write(description + "\n")
-            f.write("classifier,accuracy,model\n")
-            for name, accuracy, model in self.scores:
-                f.write(name+","+str(round(accuracy, 3))+","+str(model)+"\n")
-
+    def save_results(self, file):
+        with open(file, "a+") as f:
+            if self.n_subject is not None:
+                f.seek(0)
+                first_line = f.readline()
+                if first_line.startswith("subject"):
+                    f.seek(0, 2)  # Move cursor to the end of the file
+                else:
+                    f.seek(0)  # Remove content and write header
+                    f.truncate()
+                    f.write("subject;classifier;model;preprocessing;accuracy\n")
+                for name, accuracy, model in self.scores:
+                    f.write(str(self.n_subject) + ";" + name + ";" + str(model['learner']) +
+                            ";" + str(model['preprocs']) + ";" + str(round(accuracy, 3)) + "\n")
+            else:
+                if f.readline().startswith("classifier"):
+                    f.seek(0, 2)
+                else:
+                    f.seek(0)
+                    f.truncate()
+                    f.write("classifier;model;preprocessing;accuracy\n")
+                for name, accuracy, model in self.scores:
+                    f.write(name + ";" + str(model['learner']) + ";" + str(model['preprocs']) +
+                            ";" + str(round(accuracy, 3)) + "\n")
