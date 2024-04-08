@@ -52,7 +52,7 @@ class ProvidedDatasetLoader(DataLoader):
         data = data[:, 1:4]
         return data
 
-    def load_dataset(self, exact_targets=False, normalize=False):
+    def load_dataset(self, normalize=False):
         files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
 
         windows = []
@@ -66,7 +66,7 @@ class ProvidedDatasetLoader(DataLoader):
         dataset = []
         for w in windows:
             dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry(exact_targets))
+                                self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
         return self.dataset
 
@@ -83,7 +83,7 @@ class DHBWDatasetLoader(DataLoader):
         data = data[:, [6, 7, 14]]
         return data
 
-    def load_dataset(self, exact_targets=False, normalize=False):
+    def load_dataset(self, normalize=False):
         data = DHBWDatasetLoader._load_csv(self.dataset_path)
         if normalize:
             data = self._normalize(data)
@@ -93,7 +93,7 @@ class DHBWDatasetLoader(DataLoader):
         dataset = []
         for w in windows:
             dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry(exact_targets))
+                                self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
         return self.dataset
 
@@ -104,7 +104,7 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         self.dataset = None
         self.output_path = output_path
 
-    def load_all_datasets(self, overlap=0, exact_targets=False, normalize=False):
+    def load_all_datasets(self, overlap=0, normalize=False, pure_windows=False):
         """
             Load the datasets from each individual subject. Returns the list with the datasets.
             Windowing is now done with overlapping, sliding the time window each 2 seconds.
@@ -132,17 +132,26 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
             windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
 
             dataset = []
-            for w in windows:
-                dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                    self.fs).to_classificator_entry(exact_targets))
-            self.dataset.append(np.array(dataset))
+            if pure_windows:
+                for w in windows:
+                    if 0 < w.mean_targets < 1:  # Window does not contain unique state
+                        pass
+                    else:
+                        dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                                            self.beta_highcut, self.fs).to_classificator_entry())
+                self.dataset.append(np.array(dataset))
+            else:
+                for w in windows:
+                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                                        self.fs).to_classificator_entry())
+                self.dataset.append(np.array(dataset))
 
         # Export the datasets so that time can be saved next time
         self.export_datasets()
 
         return self.dataset
 
-    def load_single_dataset(self, subject_number, overlap=0, exact_targets=False, normalize=False):
+    def load_single_dataset(self, subject_number, overlap=0, normalize=False):
         self.dataset = None  # Clear the dataset in case it contained something
 
         # Load the individual subject specified
@@ -157,7 +166,7 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         dataset = []
         for w in windows:
             dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry(exact_targets))
+                                self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
 
         return self.dataset

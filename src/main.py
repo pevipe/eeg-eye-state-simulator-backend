@@ -57,7 +57,8 @@ def do_dataset_1_one_at_a_time():
 
 def do_dataset_1_one_at_a_time_optimized():
     # Load datasets from individual subjects
-    provided_dataset_individual_loader = ProvidedDatasetIndividualLoader("../data/dataset_1", 200, window_size)
+    provided_dataset_individual_loader = ProvidedDatasetIndividualLoader("../data/dataset_1",
+                                                                         "../out/datasets/individual", 200, window_size)
     provided_dataset_individual_loader.load_all_datasets(overlap=8)
     provided_datasets_individual = provided_dataset_individual_loader.dataset
 
