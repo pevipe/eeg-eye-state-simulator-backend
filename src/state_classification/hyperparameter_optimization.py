@@ -37,12 +37,17 @@ class ClassifierOptimization:
 
             model = HyperoptEstimator(classifier=classifier, preprocessing=any_preprocessing('pre'),
                                       algo=tpe.suggest, max_evals=50, trial_timeout=30)
-            # perform the search
-            model.fit(self.X_train, self.y_train)
-            # summarize performance
-            acc = model.score(self.X_test, self.y_test)
-            print("Accuracy: " + str(acc), end="\n\n")
-            self.scores.append((name, acc, model.best_model()))
+            try:
+                # perform the search
+                model.fit(self.X_train, self.y_train)
+                # summarize performance
+                acc = model.score(self.X_test, self.y_test)
+                print("Accuracy: " + str(acc), end="\n\n")
+                self.scores.append((name, acc, model.best_model()))
+            except Exception as e:
+                # The classifier will not contain any results, but optimization of other classifiers will continue
+                print("Error during optimization: " + str(e))
+                continue
 
     def try_one(self, cl):
         # print("Classifier: " + self.classifiers[cl])
