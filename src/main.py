@@ -4,10 +4,13 @@ import time
 from src.feature_extraction.data_loaders import ProvidedDatasetLoader, DHBWDatasetLoader, \
     ProvidedDatasetIndividualLoader
 from src.feature_extraction.constants import window_size
-from src.state_classification.classifiers import AllClassifiers
+from src.state_classification.classifiers import AllClassifiers, CustomizedClassifiers
 from src.state_classification.hyperparameter_optimization import ClassifierOptimization
 
 
+######################################
+# BASIC OPERATIONS (useless for now) #
+######################################
 def do_dataset_1():
     # Load first dataset
     provided_dataset_loader = ProvidedDatasetLoader("../data/dataset_1", 200, window_size)
@@ -58,22 +61,10 @@ def do_dataset_1_one_at_a_time():
         print(all_classifiers, end="\n\n")
 
 
-def do_dataset_1_one_at_a_time_optimized():
-    # Load datasets from individual subjects
-    provided_dataset_individual_loader = ProvidedDatasetIndividualLoader("../data/dataset_1",
-                                                                         "../out/datasets/individual", 200, window_size)
-    provided_dataset_individual_loader.load_all_datasets(overlap=8)
-    provided_datasets_individual = provided_dataset_individual_loader.dataset
-
-    print("**************************\n" +
-          "* DATASET 1 (individual) *\n" +
-          "**************************\n")
-    for i, dataset in enumerate(provided_datasets_individual):
-        optimized_classifiers = ClassifierOptimization(dataset, n_subject=i + 1)
-        optimized_classifiers.try_all()
-        optimized_classifiers.save_results("../out/results/opt_hyperopt/optimized_hyperparameters.csv")
-
-
+# TODO: parametrizar y exportar a otro fichero
+###############################
+# HYPERPARAMETER OPTIMIZATION #
+###############################
 def optimize_hyperparameters_from_dataset_1():
     # Load dataset
     dataset_loader = ProvidedDatasetIndividualLoader("../data/dataset_1",
@@ -151,24 +142,60 @@ def optimize_hyperparameters_from_dataset_1_pure_windows_norm():
 
 def setup_optimization():
     file_list = [
-        # "../out/results/opt_hyperopt_wo_avg_diff/optimized_hyperparameters.csv",
+        "../out/results/opt_hyperopt_wo_avg_diff/optimized_hyperparameters.csv",
         "../out/results/opt_hyperopt_with_avg_diff/optimized_hyperparameters.csv",
         "../out/results/opt_hyperopt_pure_windows/optimized_hyperparameters.csv",
         "../out/results/opt_hyperopt_pure_windows_norm/optimized_hyperparameters.csv"
-        ]
+    ]
     for file in file_list:
         if os.path.exists(file):
             os.remove(file)
         os.mkdir(os.path.dirname(file))
 
 
+out_dataset_from_configuration = {'00': "../out/datasets/individual_without_normalization",
+                                  '01': "../out/datasets/individual_strange_normalization",
+                                  '10': "../out/datasets/individual_pure_windows",
+                                  '11': "../out/datasets/individual_pure_windows_norm"}
+hyperaparams_from_configuration = {'00': "../out/results/opt_hyperopt_wo_avg_diff/optimized_hyperparameters.csv",
+                                   '01': "../out/results/opt_hyperopt_with_avg_diff/optimized_hyperparameters.csv",
+                                   '10': "../out/results/opt_hyperopt_pure_windows/optimized_hyperparameters.csv",
+                                   '11': "../out/results/opt_hyperopt_pure_windows_norm/optimized_hyperparameters.csv"}
+output_path_from_configuration = {'00': "../out/results/full_results_hyperopt_00",
+                                  '01': "../out/results/full_results_hyperopt_01",
+                                  '10': "../out/results/full_results_hyperopt_10",
+                                  '11': "../out/results/full_results_hyperopt_11"}
+dataset_load_from_configuration = {
+    '00': "dataset_loader.load_all_datasets(overlap=8, normalize=False, pure_windows=False)",
+    '01': "dataset_loader.load_all_datasets(overlap=8, normalize=True, pure_windows=False)",
+    '10': "dataset_loader.load_all_datasets(overlap=8, normalize=False, pure_windows=True)",
+    '11': "dataset_loader.load_all_datasets(overlap=8, normalize=True, pure_windows=True)"}
+
+
+def do_dataset_1_with_optimizations(configuration):
+    out_dataset_path = out_dataset_from_configuration[configuration]
+    hyperparams_path = hyperaparams_from_configuration[configuration]
+    output_path = output_path_from_configuration[configuration]
+
+    # Load dataset
+    dataset_loader = ProvidedDatasetIndividualLoader("../data/dataset_1", out_dataset_path,
+                                                     200, window_size)
+
+    eval(dataset_load_from_configuration[configuration])
+    provided_dataset = dataset_loader.dataset
+
+    print("****************************\n" +
+          "* DATASET 1 (optimized) "+configuration+" * \n" +
+          "****************************\n")
+    for i, dataset in enumerate(provided_dataset):
+        all_classifiers = CustomizedClassifiers(dataset, hyperparams_path, n_subject=i + 1)
+        all_classifiers.classify()
+        all_classifiers.save_results(output_path + "/subject_" + str(i + 1) + "_complete.csv",
+                                     synthesized=False, description="Results from subject " + str(i + 1))
+        print("Subject " + str(i + 1) + ":")
+        print(all_classifiers, end="\n\n")
+
+
 if __name__ == '__main__':
-    # do_dataset_1_one_at_a_time()
-    # optimize_hyperparameters_from_dataset_1()
-    setup_optimization()
-    print("\nOptimizing hyperparameters. Configuration 2: normalize=True, pure_windows=False")
-    optimize_hyperparameters_from_dataset_1_with_avg_diff()
-    print("\nOptimizing hyperparameters. Configuration 3: normalize=False, pure_windows=True")
-    optimize_hyperparameters_from_dataset_1_pure_windows()
-    print("\nOptimizing hyperparameters. Configuration 4: normalize=True, pure_windows=True")
-    optimize_hyperparameters_from_dataset_1_pure_windows_norm()
+    for config in ['01', '10', '11']:
+        do_dataset_1_with_optimizations(config)

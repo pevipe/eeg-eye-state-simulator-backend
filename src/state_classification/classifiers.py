@@ -1,11 +1,21 @@
+import os
+
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from scipy import stats
+
+from sklearn.preprocessing import (Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer, RobustScaler, StandardScaler,
+                                   QuantileTransformer, PowerTransformer, OneHotEncoder, OrdinalEncoder,
+                                   PolynomialFeatures, SplineTransformer, KBinsDiscretizer)
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.decomposition import PCA
+
 
 from sklearn.model_selection import KFold, cross_val_score
 
@@ -57,6 +67,10 @@ class AllClassifiers:
             self.scores.append((name, scores))
 
     def save_results(self, route, synthesized=True, description=""):
+        # Avoid errors with nonexistent dirs
+        if not os.path.exists(os.path.dirname(route)):
+            os.makedirs(os.path.dirname(route))
+
         with open(route, 'w') as f:
             f.write(description + "\n")
             if synthesized:
@@ -97,8 +111,16 @@ class CustomizedClassifiers(AllClassifiers):
         # each row of data has the following shape: [model_name, model_init, preprocess_init]
         models_for_this_subject = data[data[:, 0] == str(self.n_subject)][:, 1:]  # Get the models for this subject
         for (name, classifier, preprocesser) in models_for_this_subject:
-            print(name)
-            print(classifier)
-            print(preprocesser, end="\n\n")
             self.classifiers[name] = eval(classifier)
             self.preprocessers[name] = eval(preprocesser)  # TODO: import all necessary classes from sklearn
+
+    def classify(self, preprocess=True):
+        for name in self.classifiers.keys():
+            # pipe_list = []
+            # for preproc in self.preprocessers[name]:
+            #     pipe_list.append((str(preproc), preproc))
+            # pipe_list.append(("classifier", self.classifiers[name]))
+            pipe_tuple = self.preprocessers[name] + (self.classifiers[name],)
+            pipe = make_pipeline(*pipe_tuple)
+            scores = cross_val_score(pipe, self.x, self.y, scoring='accuracy', cv=self.kfold)
+            self.scores.append((name, scores))
