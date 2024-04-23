@@ -52,20 +52,27 @@ class ProvidedDatasetLoader(DataLoader):
         data = data[:, 1:4]
         return data
 
-    def load_dataset(self, exact_targets=False):
+    def load_dataset(self, overlap=0, normalize=False, pure_windows=False):
         files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
 
         windows = []
         for f in files:
             data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
-            data = self._normalize(data)
+            if normalize:
+                data = self._normalize(data)
             total_time = 600
-            windows = windows + self._all_windowing(data, total_time, self.window_size, self.fs)
+            windows = windows + self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
 
         dataset = []
         for w in windows:
+            if pure_windows:
+                if 0 < w.mean_targets < 1:
+                    pass
+                else:
+                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                                        self.fs).to_classificator_entry())
             dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry(exact_targets))
+                                self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
         return self.dataset
 
@@ -82,63 +89,114 @@ class DHBWDatasetLoader(DataLoader):
         data = data[:, [6, 7, 14]]
         return data
 
-    def load_dataset(self, exact_targets=False):
+    def load_dataset(self, normalize=False):
         data = DHBWDatasetLoader._load_csv(self.dataset_path)
-        data = self._normalize(data)
+        if normalize:
+            data = self._normalize(data)
 
         windows = self._all_windowing(data, self.total_time, self.window_size, self.fs)
 
         dataset = []
         for w in windows:
             dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry(exact_targets))
+                                self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
         return self.dataset
 
 
 class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
-    def __init__(self, dataset_path, fs, win_size):
+    def __init__(self, dataset_path, output_path, fs, win_size):
         super().__init__(dataset_path, fs, win_size)
         self.dataset = None
+        self.output_path = output_path
 
-    def load_all_datasets(self, overlap=0, exact_targets=False):
+    def load_all_datasets(self, overlap=0, normalize=False, pure_windows=False):
         """
             Load the datasets from each individual subject. Returns the list with the datasets.
-            Windowing is now done with overlapping, sliding the time window each 2 seconds.
+            Windowing is now done with the overlapping specified as parameter.
         """
         self.dataset = []  # Clear the dataset in case it contained something
         files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
 
+        # Check if the datasets have already been calculated
+        if os.path.exists(self.output_path):
+            out_files = [f for f in os.listdir(self.output_path) if f.endswith(".csv")]
+            if len(out_files) == len(files):
+                # Load the dataset that had already been calculated
+                for f in out_files:
+                    self.dataset.append(np.loadtxt(open(self.output_path + "/" + f, "rb"), delimiter=","))
+                print("Datasets loaded from the output path.")
+                return self.dataset
+        else:
+            os.makedirs(self.output_path)
+
+        # If not, calculate the datasets and export them so then can be imported later
         for f in files:
             data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
-            data = self._normalize(data)
+            if normalize:
+                data = self._normalize(data)
             # Take the samples with overlapping (sliding time window each 2 seconds)
             total_time = 600
             windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
 
             dataset = []
-            for w in windows:
-                dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                    self.fs).to_classificator_entry(exact_targets))
-            self.dataset.append(np.array(dataset))
+            if pure_windows:
+                for w in windows:
+                    if 0 < w.mean_targets < 1:  # Window does not contain unique state
+                        pass
+                    else:
+                        dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                                            self.beta_highcut, self.fs).to_classificator_entry())
+                self.dataset.append(np.array(dataset))
+            else:
+                for w in windows:
+                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                                        self.fs).to_classificator_entry())
+                self.dataset.append(np.array(dataset))
+
+        # Export the datasets so that time can be saved next time
+        self.export_datasets()
 
         return self.dataset
 
-    def load_single_dataset(self, subject_number, overlap=0, exact_targets=False):
+    def load_single_dataset(self, subject_number, overlap=0, normalize=False, pure_windows=False):
         self.dataset = None  # Clear the dataset in case it contained something
 
         # Load the individual subject specified
         data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/Sujeto_" + str(subject_number) + ".csv")
-        data = self._normalize(data)
+        if normalize:
+            data = self._normalize(data)
 
         # Take the samples with overlapping (sliding time window each 2 seconds)
         total_time = 600
         windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
 
         dataset = []
-        for w in windows:
-            dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry(exact_targets))
+        if pure_windows:
+            for w in windows:
+                if 0 < w.mean_targets < 1:  # Window does not contain unique state
+                    pass
+                else:
+                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                                        self.beta_highcut, self.fs).to_classificator_entry())
+        else:
+            for w in windows:
+                dataset.append(
+                    Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                         self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
 
         return self.dataset
+
+    def export_datasets(self, route=None):
+        if route is None:
+            route = self.output_path
+        # Create the directory if it does not exist
+        if not os.path.exists(route):
+            os.makedirs(route)
+
+        # Save the dataset to CSV files
+        for i, dataset in enumerate(self.dataset):
+            np.savetxt(route + "/subject_" + str(i + 1) + ".csv", dataset, delimiter=",")
+
+        print("Datasets exported to the output path.")
