@@ -1,0 +1,50 @@
+subject;classifier;model;preprocessing;accuracy
+1;AdaBoost;AdaBoostClassifier(learning_rate=0.1553813019510715, n_estimators=19,                random_state=4);(StandardScaler(with_mean=False),);0.724
+1;DecisionTree;DecisionTreeClassifier(criterion='entropy', max_depth=4, max_features='log2',                    max_leaf_nodes=5, random_state=1);(PCA(n_components=2, whiten=True),);0.714
+1;KNN;KNeighborsClassifier(leaf_size=32, metric='euclidean', n_jobs=1, n_neighbors=8,                  p=3.364106450871161);(PCA(n_components=2, whiten=True),);0.755
+1;LDA;LinearDiscriminantAnalysis(solver='lsqr', tol=0.00015197775100102387);(MinMaxScaler(clip=True, feature_range=(0.0, 1.0)),);0.745
+1;RandomForest;RandomForestClassifier(class_weight='balanced_subsample', max_depth=2,                    max_features='log2', max_leaf_nodes=5,                    min_impurity_decrease=0.02, min_samples_leaf=4,                    n_estimators=124, n_jobs=1, random_state=3,                    verbose=False);(StandardScaler(with_mean=False),);0.714
+1;QDA;QuadraticDiscriminantAnalysis(reg_param=0.19774578713549945,                           tol=0.0002876457646841173);(StandardScaler(with_std=False),);0.704
+1;SVM;SVC(C=0.8695107134776104, coef0=0.8075488223672749, degree=4, random_state=4, tol=0.0003345384794919521);(PCA(n_components=2, whiten=True),);0.755
+2;AdaBoost;AdaBoostClassifier(learning_rate=0.00379989910212428, n_estimators=504,                random_state=3);(StandardScaler(with_mean=False),);0.837
+2;DecisionTree;DecisionTreeClassifier(criterion='entropy', max_features='sqrt',                    max_leaf_nodes=15, random_state=2);(StandardScaler(with_mean=False),);0.827
+2;KNN;KNeighborsClassifier(algorithm='kd_tree', leaf_size=23, metric='l2', n_jobs=1,                  n_neighbors=12, p=3.0304598113618795);(PCA(n_components=2),);0.837
+2;LDA;LinearDiscriminantAnalysis(tol=0.001316533666854328);(StandardScaler(with_mean=False),);0.847
+2;RandomForest;RandomForestClassifier(max_depth=2, max_features=0.30876405509411997,                    max_leaf_nodes=10, min_samples_leaf=3, n_estimators=13,                    n_jobs=1, random_state=4, verbose=False);(StandardScaler(),);0.837
+2;QDA;QuadraticDiscriminantAnalysis(reg_param=0.4944862191679666,                           tol=0.0012968114544753846);(StandardScaler(),);0.837
+2;SVM;SVC(C=2.1662050862711246, coef0=0.5180528058128524, degree=5, gamma='auto', random_state=1, shrinking=False, tol=0.009936152365326835);(PCA(n_components=2),);
+3;AdaBoost;AdaBoostClassifier(learning_rate=0.0025524837249479805, n_estimators=256,                random_state=3);(PCA(n_components=2),);0.816
+3;DecisionTree;DecisionTreeClassifier(max_depth=3, max_features='sqrt', random_state=0);(PCA(n_components=2, whiten=True),);0.837
+3;KNN;KNeighborsClassifier(algorithm='brute', leaf_size=36, metric='cityblock',                  n_jobs=1, n_neighbors=10, p=2.954313623688274);(MinMaxScaler(feature_range=(-1.0, 1.0)),);0.867
+3;LDA;LinearDiscriminantAnalysis(tol=0.0020317896393256636);(Normalizer(norm='l1'),);0.796
+3;RandomForest;RandomForestClassifier(class_weight='balanced_subsample', n_estimators=16,                    n_jobs=1, random_state=0, verbose=False);(PCA(n_components=2, whiten=True),);0.898
+3;QDA;QuadraticDiscriminantAnalysis(reg_param=0.16122004815057633,                           tol=1.4321784524999613e-05);(Normalizer(norm='l1'),);0.765
+3;SVM;SVC(C=0.8656525882266828, coef0=0.996512975748547, decision_function_shape='ovo', degree=5, gamma='auto', random_state=4, tol=0.00060015316781044);(PCA(n_components=2, whiten=True),);0.898
+4;AdaBoost;AdaBoostClassifier(learning_rate=0.2749801922479222, n_estimators=37,                random_state=4);(StandardScaler(),);0.888
+4;DecisionTree;DecisionTreeClassifier(criterion='entropy', max_features=0.9193706021140098,                    random_state=3);(MinMaxScaler(clip=True, feature_range=(-1.0, 1.0)),);0.847
+4;KNN;KNeighborsClassifier(algorithm='kd_tree', leaf_size=29, metric='euclidean',                  n_jobs=1, n_neighbors=14, p=2.2126138764287115);(StandardScaler(with_mean=False),);0.878
+4;LDA;LinearDiscriminantAnalysis(solver='eigen', tol=0.0034183745640565862);(StandardScaler(with_std=False),);0.796
+4;RandomForest;RandomForestClassifier(n_estimators=41, n_jobs=1, random_state=2, verbose=False);(MinMaxScaler(feature_range=(0.0, 1.0)),);0.888
+4;QDA;QuadraticDiscriminantAnalysis(reg_param=0.010043137273390013,                           tol=0.0034614823121602986);(PCA(n_components=2, whiten=True),);0.847
+4;SVM;SVC(C=1.148136708008524, coef0=0.145868521100195, degree=5, random_state=3, tol=5.9890678835675976e-05);(MinMaxScaler(clip=True, feature_range=(-1.0, 1.0)),);0.898
+5;AdaBoost;AdaBoostClassifier(learning_rate=0.0010755823005801873, n_estimators=12,                random_state=3);(MinMaxScaler(clip=True, feature_range=(-1.0, 1.0)),);0.867
+5;DecisionTree;DecisionTreeClassifier(max_depth=4, max_features='sqrt', max_leaf_nodes=5,                    random_state=4);(StandardScaler(with_std=False),);0.878
+5;KNN;KNeighborsClassifier(algorithm='brute', leaf_size=29, metric='l1', n_jobs=1,                  n_neighbors=10, p=3.6912348870199043);(MinMaxScaler(feature_range=(-1.0, 1.0)),);0.847
+5;LDA;LinearDiscriminantAnalysis(solver='eigen', tol=0.002361488172682608);(Normalizer(),);0.776
+5;RandomForest;RandomForestClassifier(max_depth=3, max_features='log2', max_leaf_nodes=15,                    min_samples_leaf=16, n_estimators=29, n_jobs=1,                    random_state=4, verbose=False);(MinMaxScaler(feature_range=(-1.0, 1.0)),);0.847
+5;QDA;QuadraticDiscriminantAnalysis(reg_param=0.045900107407683854,                           tol=2.897932576780666e-05);(StandardScaler(with_mean=False, with_std=False),);0.898
+5;SVM;SVC(C=2.1662050862711246, coef0=0.5180528058128524, degree=5, gamma='auto', random_state=1, shrinking=False, tol=0.009936152365326835);(PCA(n_components=2),);
+6;AdaBoost;AdaBoostClassifier(learning_rate=0.011134244226505717, n_estimators=383,                random_state=4);(StandardScaler(with_std=False),);0.878
+6;DecisionTree;DecisionTreeClassifier(max_features=0.5678525385628925, max_leaf_nodes=10,                    random_state=0, splitter='random');(MinMaxScaler(clip=True, feature_range=(0.0, 1.0)),);0.908
+6;KNN;KNeighborsClassifier(algorithm='brute', metric='euclidean', n_jobs=1,                  p=1.185528791286571, weights='distance');(MinMaxScaler(clip=True, feature_range=(0.0, 1.0)),);0.857
+6;LDA;LinearDiscriminantAnalysis(tol=0.00045334543533930553);(Normalizer(),);0.878
+6;RandomForest;RandomForestClassifier(max_features=0.9854392276801234, max_leaf_nodes=15,                    n_estimators=193, n_jobs=1, random_state=3,                    verbose=False);(MinMaxScaler(feature_range=(-1.0, 1.0)),);0.867
+6;QDA;QuadraticDiscriminantAnalysis(reg_param=0.0010368746468753473,                           tol=5.2916418910815026e-05);(Normalizer(),);0.878
+6;SVM;SVC(C=0.6498331827502508, coef0=0.5581867186173228, degree=5, kernel='poly', random_state=0, tol=0.004440345100653512);(Normalizer(),);0.857
+7;AdaBoost;AdaBoostClassifier(learning_rate=0.009468696953959584, n_estimators=155,                random_state=2);(StandardScaler(),);0.541
+7;DecisionTree;DecisionTreeClassifier(criterion='entropy', max_depth=4, random_state=4);(Normalizer(norm='l1'),);0.531
+7;KNN;KNeighborsClassifier(algorithm='brute', leaf_size=31, metric='euclidean',                  n_jobs=1, n_neighbors=9, p=4.528626141728331);(Normalizer(norm='l1'),);0.49
+7;LDA;LinearDiscriminantAnalysis(solver='lsqr', tol=0.0013243056989480466);(Normalizer(norm='l1'),);0.49
+7;RandomForest;RandomForestClassifier(class_weight='balanced',                    max_features=0.44953440620826246, min_samples_leaf=3,                    n_estimators=126, n_jobs=1, random_state=1,                    verbose=False);(Normalizer(norm='l1'),);0.5
+7;QDA;QuadraticDiscriminantAnalysis(reg_param=0.2558492278667599,                           tol=0.0015161921319780081);(StandardScaler(with_std=False),);0.48
+7;SVM;SVC(C=1.2994192952051056, coef0=0.6997772146383722, decision_function_shape='ovo', kernel='poly', random_state=4, tol=0.005652000684686526);(MinMaxScaler(feature_range=(-1.0, 1.0)),);0.582
