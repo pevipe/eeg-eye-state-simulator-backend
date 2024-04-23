@@ -24,7 +24,6 @@ classifier_dict = {'AB': AdaBoostClassifier(learning_rate=0.0645050649100435, n_
                    'DT': DecisionTreeClassifier(),
                    'KNN': KNeighborsClassifier(),
                    'LDA': LinearDiscriminantAnalysis(),
-                   # 'LR': LogisticRegression(),
                    'RF': RandomForestClassifier(),
                    'QDA': QuadraticDiscriminantAnalysis(),
                    'SVM': SVC(C=1.2747788661328625, coef0=0.00425697976468159, random_state=0,

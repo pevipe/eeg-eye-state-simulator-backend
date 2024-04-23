@@ -10,7 +10,6 @@ classifier_dict = {
     'DecisionTree': decision_tree_classifier('dtc'),
     'KNN': k_neighbors_classifier('knc'),
     'LDA': linear_discriminant_analysis('lda'),
-    # 'LogisticRegression': TODO: DELETE
     'RandomForest': random_forest_classifier('rfc'),
     'QDA': quadratic_discriminant_analysis('qda'),
     'SVM': svc('svc'),
