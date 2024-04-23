@@ -113,7 +113,7 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
     def load_all_datasets(self, overlap=0, normalize=False, pure_windows=False):
         """
             Load the datasets from each individual subject. Returns the list with the datasets.
-            Windowing is now done with overlapping, sliding the time window each 2 seconds.
+            Windowing is now done with the overlapping specified as parameter.
         """
         self.dataset = []  # Clear the dataset in case it contained something
         files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
@@ -127,6 +127,8 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
                     self.dataset.append(np.loadtxt(open(self.output_path + "/" + f, "rb"), delimiter=","))
                 print("Datasets loaded from the output path.")
                 return self.dataset
+        else:
+            os.makedirs(self.output_path)
 
         # If not, calculate the datasets and export them so then can be imported later
         for f in files:

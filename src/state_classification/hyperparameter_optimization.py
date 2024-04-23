@@ -1,3 +1,5 @@
+import os
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from hpsklearn import HyperoptEstimator, any_preprocessing, quadratic_discriminant_analysis
@@ -65,6 +67,12 @@ class ClassifierOptimization:
     def save_results(self, file):
         if not file.endswith(".csv"):
             file = file + ".csv"
+        if not os.path.exists(file):
+            with open(file, "w") as f:
+                if self.n_subject is not None:
+                    f.write("subject;classifier;model;preprocessing;accuracy\n")
+                else:
+                    f.write("classifier;model;preprocessing;accuracy\n")
         with open(file, "a+") as f:
             if self.n_subject is not None:
                 f.seek(0)
