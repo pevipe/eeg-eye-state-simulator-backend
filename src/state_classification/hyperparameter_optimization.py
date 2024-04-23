@@ -64,6 +64,8 @@ class ClassifierOptimization:
         self.scores.append((name, acc, model.best_model()))
 
     def save_results(self, file):
+        if not file.endswith(".csv"):
+            file = file + ".csv"
         with open(file, "a+") as f:
             if self.n_subject is not None:
                 f.seek(0)
@@ -85,5 +87,5 @@ class ClassifierOptimization:
                     f.truncate()
                     f.write("classifier;model;preprocessing;accuracy\n")
                 for name, accuracy, model in self.scores:
-                    f.write(name + ";" + str(model['learner']) + ";" + str(model['preprocs']) +
-                            ";" + str(round(accuracy, 3)) + "\n")
+                    f.write((name + ";" + str(model['learner']) + ";" + str(model['preprocs']) +
+                            ";" + str(round(accuracy, 3)) + "\n").replace("\n   ", ""))

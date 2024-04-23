@@ -52,7 +52,7 @@ class ProvidedDatasetLoader(DataLoader):
         data = data[:, 1:4]
         return data
 
-    def load_dataset(self, normalize=False):
+    def load_dataset(self, overlap=0, normalize=False, pure_windows=False):
         files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
 
         windows = []
@@ -61,10 +61,16 @@ class ProvidedDatasetLoader(DataLoader):
             if normalize:
                 data = self._normalize(data)
             total_time = 600
-            windows = windows + self._all_windowing(data, total_time, self.window_size, self.fs)
+            windows = windows + self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
 
         dataset = []
         for w in windows:
+            if pure_windows:
+                if 0 < w.mean_targets < 1:
+                    pass
+                else:
+                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                                        self.fs).to_classificator_entry())
             dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                                 self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
@@ -151,7 +157,7 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
 
         return self.dataset
 
-    def load_single_dataset(self, subject_number, overlap=0, normalize=False):
+    def load_single_dataset(self, subject_number, overlap=0, normalize=False, pure_windows=False):
         self.dataset = None  # Clear the dataset in case it contained something
 
         # Load the individual subject specified
@@ -164,9 +170,18 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
         windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
 
         dataset = []
-        for w in windows:
-            dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry())
+        if pure_windows:
+            for w in windows:
+                if 0 < w.mean_targets < 1:  # Window does not contain unique state
+                    pass
+                else:
+                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                                        self.beta_highcut, self.fs).to_classificator_entry())
+        else:
+            for w in windows:
+                dataset.append(
+                    Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                         self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
 
         return self.dataset
