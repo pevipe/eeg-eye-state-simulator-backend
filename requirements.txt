@@ -5,3 +5,5 @@ scikit-learn~=1.3.2
 pandas~=2.2.1
 hyperopt~=0.2.7
 hpsklearn~=1.0.3
+
+seaborn~=0.13.2
