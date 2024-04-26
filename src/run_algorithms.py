@@ -49,10 +49,9 @@ def get_optimized_hyperparameters_for_all_subjects(dataset, hyperparams_output_p
 
 
 def get_optimized_hyperparameters_for_one_subject(dataset, hyperparams_output_path, n_subject):
-
     print("*** Optimizing hyperparameters for subject " + str(n_subject) + " ***\n")
     start_time = time.time()
-    optimized_classifiers = ClassifierOptimization(dataset[n_subject-1], n_subject=n_subject)
+    optimized_classifiers = ClassifierOptimization(dataset[n_subject - 1], n_subject=n_subject)
     optimized_classifiers.try_all()
     optimized_classifiers.save_results(hyperparams_output_path)
     print("Subject " + str(n_subject) + " optimized in " + str(time.time() - start_time) + " seconds.\n")
@@ -98,9 +97,8 @@ def get_estimated_performance(dataset, hyperparam_path, output_path, pure_window
 
 
 def get_estimated_performance_one_optimization(dataset, optimized_hyperparameters_path, output_path, pure_windows):
-
     for i in range(7):
-        print("*** Classifying subject " + str(i+1) + " ***\n")
+        print("*** Classifying subject " + str(i + 1) + " ***\n")
         start_time = time.time()
 
         all_classifiers = CustomizedClassifiers(dataset[i], optimized_hyperparameters_path)
@@ -113,7 +111,7 @@ def get_estimated_performance_one_optimization(dataset, optimized_hyperparameter
             all_classifiers.get_cross_val_scores()
             all_classifiers.save_cross_val_results(output_path + "/subject_" + str(i + 1) + "_complete.csv")
 
-        print("Subject " + str(i+1) + " classified in " + str(time.time() - start_time) + " seconds.\n")
+        print("Subject " + str(i + 1) + " classified in " + str(time.time() - start_time) + " seconds.\n")
 
 
 def transform_results(folder_path, pure_windows):
@@ -122,6 +120,8 @@ def transform_results(folder_path, pure_windows):
     # Read the csv
     if pure_windows:
         for i, f in enumerate(os.listdir(folder_path)):
+            if f == 'full_results.csv':
+                continue
             if f.endswith('.csv'):
                 df = pd.read_csv(folder_path + '/' + f)[
                     ['classifier', 'precision_0', 'f1_0', 'precision_1', 'f1_1', 'accuracy']]
@@ -129,6 +129,8 @@ def transform_results(folder_path, pure_windows):
                 dataframe = pd.concat([dataframe, df], ignore_index=True)
     else:
         for i, f in enumerate(os.listdir(folder_path)):
+            if f == 'full_results.csv':
+                continue
             if f.endswith('.csv'):
                 df = pd.read_csv(folder_path + '/' + f)[['classifier', 'mean_accuracy', 'std_accuracy']]
                 df.insert(0, 'subject', i + 1)
@@ -170,6 +172,7 @@ def run_all(individual, win_size, pure_windows, dataset_input_path, n_subject=No
     if individual:
         get_estimated_performance(dataset, hyperparams_output_path, result_output_path, pure_windows, n_subject)
     else:
+        dataset = get_dataset(dataset_input_path, True, win_size, pure_windows)
         get_estimated_performance_one_optimization(dataset, hyperparams_output_path, result_output_path, pure_windows)
 
     transform_results(result_output_path, pure_windows)

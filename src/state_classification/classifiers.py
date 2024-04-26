@@ -107,6 +107,7 @@ class CustomizedClassifiers(AllClassifiers):
         self.scores = {}
 
     def get_classifiers(self):
+        print(f"Loading classifiers from '{self.customization_path}'...")
         self.classifiers = {}  # Reset the classifiers
         # csv will have: subject,classifier_name,classifier_init,preprocess_init,accuracy
         # Open a csv file and read the hyperparameters for each classifier
