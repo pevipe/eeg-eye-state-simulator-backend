@@ -18,43 +18,34 @@ def get_data(out_file, pure_windows, opened=False, precision=True):
 
 
 # function for setting the colors of the box plots pairs
-def setBoxColors(bp):
-    setp(bp['boxes'][0], color='blue')
-    setp(bp['caps'][0], color='blue')
-    setp(bp['caps'][1], color='blue')
-    setp(bp['whiskers'][0], color='blue')
-    setp(bp['whiskers'][1], color='blue')
-    setp(bp['fliers'][0], color='blue')
-    setp(bp['fliers'][1], color='blue')
-    setp(bp['medians'][0], color='blue')
-
-    setp(bp['boxes'][1], color='red')
-    setp(bp['caps'][2], color='red')
-    setp(bp['caps'][3], color='red')
-    setp(bp['whiskers'][2], color='red')
-    setp(bp['whiskers'][3], color='red')
-    setp(bp['fliers'][0], color='red')
-    setp(bp['fliers'][1], color='red')
-    setp(bp['medians'][1], color='red')
+def setBoxColors(bp, col):
+    setp(bp['boxes'], color='blue' if col == 0 else 'red')
+    setp(bp['caps'], color='blue' if col == 0 else 'red')
+    setp(bp['medians'], color='blue' if col == 0 else 'red')
+    setp(bp['fliers'], markeredgecolor='blue' if col == 0 else 'red')
+    setp(bp['whiskers'], color='blue' if col == 0 else 'red')
 
 
-def get_boxplots(out_file, pure_windows, precision=True):
+def get_boxplots(out_pure_win_file, precision=True):
     # get the data
-    opened_data = get_data(out_file, pure_windows, opened=True, precision=precision)
-    closed_data = get_data(out_file, pure_windows, opened=False, precision=precision)
+    opened_data = get_data(out_pure_win_file, pure_windows=True, opened=True, precision=precision)
+    closed_data = get_data(out_pure_win_file, pure_windows=True, opened=False, precision=precision)
 
     figure()
     ax = axes()
 
     # Each column will be an algorithm -> a pair of boxplots
     for i in range(len(opened_data[1])):
-        data = [opened_data[:, i], closed_data[:, i]]
+        data = [opened_data[:, i]]
         initial_pos = 1 + i*3
-        bp = boxplot(data, positions=[initial_pos, initial_pos + 1], widths=0.6)
-        setBoxColors(bp)
+        bp = boxplot(data, positions=[initial_pos], widths=0.6)
+        setBoxColors(bp, 0)
+        data = closed_data[:, i]
+        bp = boxplot(data, positions=[initial_pos + 1], widths=0.6)
+        setBoxColors(bp, 1)
 
     # set axes limits and labels
-    final_pos = 1 + len(opened_data[1])*3
+    final_pos = len(opened_data[1])*3
     xlim(0, final_pos)
     ylim(0.3, 1.2)
     ax.set_xticks([1.5 + i*3 for i in range(len(opened_data[1]))])
@@ -72,5 +63,5 @@ def get_boxplots(out_file, pure_windows, precision=True):
 
 
 if __name__ == "__main__":
-    out_filepath = "../../out/results/collective/10s/pure_windows/full_results.csv"
-    get_boxplots(out_filepath, pure_windows=True, precision=True)
+    out_pure_filepath = "../../out/results/collective/10s/pure_windows/full_results.csv"
+    get_boxplots(out_pure_filepath, precision=True)
