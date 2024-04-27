@@ -1,8 +1,8 @@
 classifier;model;preprocessing;accuracy
-AdaBoost;AdaBoostClassifier(learning_rate=0.05821608095421719, n_estimators=774,                random_state=4);(MinMaxScaler(clip=True, feature_range=(0.0, 1.0)),);0.757
-DecisionTree;DecisionTreeClassifier(criterion='entropy', random_state=0);(PCA(n_components=2, whiten=True),);0.896
-KNN;KNeighborsClassifier(algorithm='kd_tree', leaf_size=22, metric='l2', n_jobs=1,                  n_neighbors=4, p=3.3250020998376746, weights='distance');(PCA(n_components=2, whiten=True),);0.908
-LDA;LinearDiscriminantAnalysis(solver='eigen', tol=2.547433102152297e-05);(Normalizer(norm='max'),);0.646
-RandomForest;RandomForestClassifier(class_weight='balanced', max_features=0.5830800023750898,                    n_estimators=1454, n_jobs=1, random_state=1,                    verbose=False);(PCA(n_components=2, whiten=True),);0.915
-QDA;QuadraticDiscriminantAnalysis(reg_param=0.0034186086336039645,                           tol=2.3413206852829788e-05);(StandardScaler(with_std=False),);0.598
-SVM;SVC(C=0.8474148728547799, coef0=0.21919968813861612, decision_function_shape='ovo', degree=1, gamma='auto', random_state=2, shrinking=False, tol=4.434706583556516e-05);(PCA(n_components=2),);0.787
+AdaBoost;AdaBoostClassifier(learning_rate=1.2996814761323436, n_estimators=404,                random_state=2);(PCA(n_components=2, whiten=True),);0.773
+DecisionTree;DecisionTreeClassifier(criterion='entropy', random_state=2);(PCA(n_components=2, whiten=True),);0.897
+KNN;KNeighborsClassifier(algorithm='kd_tree', leaf_size=39, metric='cityblock',                  n_jobs=1, n_neighbors=4, p=2.116215739363901,                  weights='distance');(StandardScaler(),);0.911
+LDA;LinearDiscriminantAnalysis(tol=0.007481572672601672);(Normalizer(norm='max'),);0.646
+RandomForest;RandomForestClassifier(class_weight='balanced_subsample', max_features='log2',                    min_samples_split=3, n_estimators=2613, n_jobs=1,                    random_state=0, verbose=False);(PCA(n_components=2),);0.915
+QDA;QuadraticDiscriminantAnalysis(reg_param=0.01517089046323658,                           tol=7.07798108428292e-05);(StandardScaler(with_std=False),);0.594
+SVM;SVC(C=2.3326297252555723, coef0=0.7798456671755614, decision_function_shape='ovo', degree=4, gamma='auto', random_state=3, shrinking=False, tol=0.0006603545430114439);(PCA(n_components=2),);0.79
