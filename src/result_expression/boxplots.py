@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import numpy as np
 from matplotlib.pyplot import plot, show, savefig, xlim, figure, ylim, legend, boxplot, setp, axes
 
@@ -26,7 +28,7 @@ def setBoxColors(bp, col):
     setp(bp['fliers'], markeredgecolor='blue' if col == 0 else 'red' if col == 1 else 'green')
 
 
-def get_boxplots(out_pure_win_file, out_all_win_file, precision=True):
+def get_boxplots(out_pure_win_file, out_all_win_file, boxplot_out_path, precision=True, show=False):
     # get the data
     opened_data = get_data(out_pure_win_file, pure_windows=True, opened=True, precision=precision)
     closed_data = get_data(out_pure_win_file, pure_windows=True, opened=False, precision=precision)
@@ -38,7 +40,7 @@ def get_boxplots(out_pure_win_file, out_all_win_file, precision=True):
     # Each column will be an algorithm -> a trio of boxplots
     for i in range(len(opened_data[1])):
         data = [opened_data[:, i]]
-        initial_pos = 1 + i*4
+        initial_pos = 1 + i * 4
         bp = boxplot(data, positions=[initial_pos], widths=0.6)
         setBoxColors(bp, 0)
         data = closed_data[:, i]
@@ -49,10 +51,10 @@ def get_boxplots(out_pure_win_file, out_all_win_file, precision=True):
         setBoxColors(bp, 3)
 
     # set axes limits and labels
-    final_pos = len(opened_data[1])*4
+    final_pos = len(opened_data[1]) * 4
     xlim(0, final_pos)
     ylim(0.3, 1.2)
-    ax.set_xticks([1.5 + i*4 for i in range(len(opened_data[1]))])
+    ax.set_xticks([1.5 + i * 4 for i in range(len(opened_data[1]))])
     ax.set_xticklabels(['AB', 'DT', 'KNN', 'LDA', 'RF', 'QDA', 'SVM'])
 
     # draw temporary red and blue lines and use them to create a legend
@@ -64,11 +66,27 @@ def get_boxplots(out_pure_win_file, out_all_win_file, precision=True):
     hR.set_visible(False)
     hG.set_visible(False)
 
-    savefig('boxcompare.png')
-    show()
+    os.makedirs(boxplot_out_path, exist_ok=True)
+    savefig(boxplot_out_path + '/boxplot.png')
+    if show:
+        show()
+
+
+def get_paths(root_dir):
+    routes_list = []
+    for root, dirs, files in os.walk(root_dir):
+        # Check if we are in the level of 10s, 5s, 8s folders
+        if os.path.basename(root) in ['10s', '5s', '8s']:
+            all_windows_csv = os.path.join(root, 'all_windows', 'full_results.csv')
+            pure_windows_csv = os.path.join(root, 'pure_windows', 'full_results.csv')
+            if os.path.exists(all_windows_csv) and os.path.exists(pure_windows_csv):
+                out_boxplot_path = os.path.join(Path(root_dir).parent, 'boxplots', os.path.relpath(root, root_dir))
+                routes_list.append((all_windows_csv, pure_windows_csv, out_boxplot_path))
+
+    return routes_list
 
 
 if __name__ == "__main__":
-    out_pure_filepath = "../../out/results/collective/10s/pure_windows/full_results.csv"
-    out_all_filepath = "../../out/results/collective/10s/all_windows/full_results.csv"
-    get_boxplots(out_pure_filepath, out_all_filepath, precision=True)
+    routes = get_paths("../../out/results")
+    for all_win_csv, pure_win_csv, out_boxplot in routes:
+        get_boxplots(pure_win_csv, all_win_csv, out_boxplot)
