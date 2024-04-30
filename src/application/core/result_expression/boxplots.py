@@ -87,6 +87,6 @@ def get_paths(root_dir):
 
 
 if __name__ == "__main__":
-    routes = get_paths("../../out/results")
+    routes = get_paths("../../../../out/results")
     for all_win_csv, pure_win_csv, out_boxplot in routes:
         get_boxplots(pure_win_csv, all_win_csv, out_boxplot)

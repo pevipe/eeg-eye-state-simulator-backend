@@ -1,9 +1,9 @@
 import numpy as np
 import os
 
-from src.feature_extraction.rates import Rate
-from src.feature_extraction.window import Window
-from src.feature_extraction.constants import alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
+from src.application.core.feature_extraction.rates import Rate
+from src.application.core.feature_extraction.window import Window
+from src.application.core.feature_extraction.constants import alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
 
 
 class DataLoader:

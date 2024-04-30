@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-from src.feature_extraction.window import Window
+from src.application.core.feature_extraction.window import Window
 
 
 def butter_bandpass(lowcut, highcut, fs, order=5):

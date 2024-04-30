@@ -3,9 +3,9 @@ import time
 
 import pandas as pd
 
-from src.feature_extraction.data_loaders import ProvidedDatasetIndividualLoader, ProvidedDatasetLoader
-from src.state_classification.classifiers import CustomizedClassifiers
-from src.state_classification.hyperparameter_optimization import ClassifierOptimization
+from src.application.core.feature_extraction import ProvidedDatasetIndividualLoader, ProvidedDatasetLoader
+from src.application.core.state_classification.classifiers import CustomizedClassifiers
+from src.application.core.state_classification import ClassifierOptimization
 
 
 def get_routes(ty, individual, win_size, pure_windows):

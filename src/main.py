@@ -1,4 +1,4 @@
-from feature_extraction.constants import dataset_path
+from src.application.core.feature_extraction.constants import dataset_path
 from run_algorithms import run_all
 
 
