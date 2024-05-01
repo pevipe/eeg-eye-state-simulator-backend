@@ -211,3 +211,46 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
             np.savetxt(route + "/subject_" + str(i + 1) + ".csv", dataset, delimiter=",")
 
         print("Datasets exported to the output path.")
+
+
+class SingleDatasetLoader(ProvidedDatasetIndividualLoader):
+    def __init__(self, dataset_path, output_path, win_size, fs=200):
+        super().__init__(dataset_path, output_path, fs, win_size)
+        self.load_a_dataset()
+        self.export_dataset()
+
+    def load_a_dataset(self, overlap=0, pure_windows=False):
+        self.dataset = None  # Clear the dataset in case it contained something
+
+        if os.path.exists(self.output_path):
+            # load the dataset from the output path
+            self.dataset = np.loadtxt(open(self.output_path, "rb"), delimiter=",")
+            return self.dataset
+
+        # Load the individual subject specified
+        data = ProvidedDatasetLoader._load_csv(self.dataset_path)
+
+        # Take the samples with overlapping (sliding time window each 2 seconds)
+        total_time = 600
+        windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
+
+        dataset = []
+        if pure_windows:
+            for w in windows:
+                if 0 < w.mean_targets < 1:  # Window does not contain unique state
+                    pass
+                else:
+                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                                        self.beta_highcut, self.fs).to_classificator_entry())
+        else:
+            for w in windows:
+                dataset.append(
+                    Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                         self.fs).to_classificator_entry())
+        self.dataset = np.array(dataset)
+
+        return self.dataset
+
+    def export_dataset(self):
+        # Save the dataset to CSV
+        np.savetxt(self.output_path, self.dataset, delimiter=",")
