@@ -1,9 +1,20 @@
 import numpy as np
 import os
 
+from src.application.adapters.persistence.repository import is_loaded_subject, get_subject_loc
 from src.application.core.feature_extraction.rates import Rate
 from src.application.core.feature_extraction.window import Window
 from src.application.core.feature_extraction.constants import alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
+
+
+def upload_subject(subject_name, content):
+    if is_loaded_subject(subject_name):
+        # delete_subject_if_not_equal
+        return
+    else:
+        loc = get_subject_loc(subject_name)
+        with open(loc, 'w') as f:
+            f.write(content)
 
 
 class DataLoader:

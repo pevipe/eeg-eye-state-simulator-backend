@@ -9,6 +9,14 @@ def get_loaded_subjects():
     return [subject for subject in all_in_datasets if os.path.isdir(os.path.join(base_directory, 'datasets', subject))]
 
 
+def is_loaded_subject(subject):
+    return os.path.exists(os.path.join(base_directory, 'datasets', subject, f'{subject}.csv'))
+
+
+def get_subject_loc(subject):
+    return os.path.join(base_directory, 'datasets', subject, f'{subject}.csv')
+
+
 def is_windowed(subject, window):
     return os.path.exists(os.path.join(base_directory, 'datasets', subject, f"{window}s.csv"))
 
@@ -23,6 +31,10 @@ def is_optimized_subject_for_algorithm(subject, algorithm, window=10):
 
 def get_optimized_for_subject_and_algorithm_loc(subject, algorithm, window=10):
     return os.path.join(base_directory, 'hyperparams', subject, f"{window}s", f"{algorithm}.csv")
+
+
+def get_optimized_general_loc(algorithm):
+    return os.path.join(base_directory, 'hyperparams_general', f"{algorithm}.csv")
 
 
 def has_results(subject, algorithm, window=10):
