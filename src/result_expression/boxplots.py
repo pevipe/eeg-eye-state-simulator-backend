@@ -61,7 +61,7 @@ def get_boxplots(out_pure_win_file, out_all_win_file, boxplot_out_path, precisio
     hB, = plot([1, 1], 'b-')
     hR, = plot([1, 1], 'r-')
     hG, = plot([1, 1], 'g-')
-    legend((hB, hR, hG), ('Pure closed', 'Pure opened', 'All windows'))
+    legend((hB, hR, hG), ('Pure opened', 'Pure closed', 'All windows'))
     hB.set_visible(False)
     hR.set_visible(False)
     hG.set_visible(False)
