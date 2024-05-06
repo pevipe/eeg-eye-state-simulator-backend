@@ -17,6 +17,19 @@ def get_subject_loc(subject):
     return os.path.join(base_directory, 'datasets', subject, f'{subject}.csv')
 
 
+def upload_subject(subject_name, content):
+    loc = get_subject_loc(subject_name)
+
+    if is_loaded_subject(subject_name):
+        with open(loc, 'r') as f:
+            file_content = f.read(content)
+            if file_content == content:
+                return "The file was already uploaded."
+        with open(loc, 'w') as f:  # Overwrite the file
+            f.write(content)
+            return "Successfully uploaded file."
+
+
 def is_windowed(subject, window):
     return os.path.exists(os.path.join(base_directory, 'datasets', subject, f"{window}s.csv"))
 
@@ -33,8 +46,8 @@ def get_optimized_for_subject_and_algorithm_loc(subject, algorithm, window=10):
     return os.path.join(base_directory, 'hyperparams', subject, f"{window}s", f"{algorithm}.csv")
 
 
-def get_optimized_general_loc(algorithm):
-    return os.path.join(base_directory, 'hyperparams_general', f"{algorithm}.csv")
+def get_optimized_general_loc(algorithm, window=10):
+    return os.path.join(base_directory, 'hyperparams_general', f'{window}s', f"{algorithm}.csv")
 
 
 def has_results(subject, algorithm, window=10):
