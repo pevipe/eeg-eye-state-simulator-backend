@@ -1,5 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from src.application.adapters.api.routes import router
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -10,5 +13,13 @@ def create_app() -> FastAPI:
         redoc_url="/redocs")
 
     app.include_router(prefix="/classifiers", router=router)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:4200"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST"],
+        allow_headers=["*"],
+    )
 
     return app
