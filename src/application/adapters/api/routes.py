@@ -14,13 +14,14 @@ def list_of_uploaded_subjects():
     return JSONResponse(content={"data": names_list})
 
 
-# @router.post("/upload_subject")
-# async def upload_dataset(file: UploadFile = File(...)):
-#     name = file.filename.rsplit('.csv')[0]
-#     content = await file.read()
-#     m = upload_subject(name, content)
-#     return m
-#     # return JSONResponse(content={"message": m}, status_code=200)
+@router.post("/upload_subject")
+async def upload_dataset(file: UploadFile = File(...)):
+    name = file.filename.rsplit('.csv')[0]
+    print("Uploading subject:", name)
+    content = await file.read()
+    m = upload_subject(name, content)
+    return m
+    # return JSONResponse(content={"message": m}, status_code=200)
 
 
 # from fastapi.middleware.cors import CORSMiddleware

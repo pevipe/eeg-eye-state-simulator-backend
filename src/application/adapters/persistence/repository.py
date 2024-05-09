@@ -25,9 +25,13 @@ def upload_subject(subject_name, content):
             file_content = f.read(content)
             if file_content == content:
                 return "The file was already uploaded."
-        with open(loc, 'w') as f:  # Overwrite the file
-            f.write(content)
-            return "Successfully uploaded file."
+    else:
+        # Create directory if not exists
+        if not os.path.exists(os.path.dirname(loc)):
+            os.makedirs(os.path.dirname(loc))
+    with open(loc, 'wb') as f:  # Overwrite the file
+        f.write(content)
+        return "Successfully uploaded file."
 
 
 def is_windowed(subject, window):
