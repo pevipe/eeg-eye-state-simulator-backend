@@ -9,3 +9,9 @@ Although it could be automatically installed with the `requirements.txt` file,
 the version of the package (0.1.0) would not be compatible with versions of Python
 3.11. Newer versions of the library, such as 0.1.3, are needed.
 
+# Run the API
+To run the backend for the eeg-simulator, using pipenv (`pipenv install`) is recommended:
+```bash
+pipenv run uvicorn src.main:create_app --factory --reload
+```
+
