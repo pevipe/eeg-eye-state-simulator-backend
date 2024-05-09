@@ -6,9 +6,9 @@ from src.application.core.state_classification.hyperparameter_optimization impor
 
 def make_windows(subject: str, window: int):
     subject_loc = get_subject_loc(subject)
-    data_loc = get_windowed_subject_loc(subject, window)
-    SingleDatasetLoader(subject_loc, data_loc, window)
-    return SingleDatasetLoader(subject_loc, data_loc, window).dataset
+    out_window_loc = get_windowed_subject_loc(subject, window)
+    SingleDatasetLoader(subject_loc, out_window_loc, window)
+    return SingleDatasetLoader(subject_loc, out_window_loc, window).dataset
 
 
 def optimize_for_algorithm(subject: str, algorithm: str, window: int):

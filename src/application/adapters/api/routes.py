@@ -19,28 +19,16 @@ async def upload_dataset(file: UploadFile = File(...)):
     name = file.filename.rsplit('.csv')[0]
     print("Uploading subject:", name)
     content = await file.read()
-    m = upload_subject(name, content)
-    return m
+    return upload_subject(name, content)
     # return JSONResponse(content={"message": m}, status_code=200)
 
 
-# from fastapi.middleware.cors import CORSMiddleware
-# CORS middleware to allow requests from Angular
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["http://tu-aplicacion-angular.com"],
-#     allow_credentials=True,
-#     allow_methods=["GET", "POST"],
-#     allow_headers=["*"],
-# )
+@router.post("/window_subject")
+async def window_subject(subject: str, window: int):
+    print("Windowing subject:", subject, "with window size:", window)
+    make_windows(subject, window)
+    return JSONResponse(content={"message": "Subject windowed successfully"}, status_code=200)
 
-
-#
-# @router.post("window_subject")
-# async def window_subject(subject: str, window: int):
-#     make_windows(subject, window)
-#     return JSONResponse(content={"message": "Subject windowed successfully"}, status_code=200)
-#
 #
 # @router.post("/optimize")
 # async def optimize_subject_algorithm(subject: str, algorithm: str, window: int):
