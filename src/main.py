@@ -1,8 +1,14 @@
-from src.application.core.feature_extraction.constants import dataset_path
-from run_algorithms import run_all
+from fastapi import FastAPI
+from src.application.adapters.api.routes import router
 
+def create_app() -> FastAPI:
+    app = FastAPI(
+        version="0.1.0",
+        title="Classifiers API",
+        description="Classifiers API for EEG data",
+        docs_url="/docs",
+        redoc_url="/redocs")
 
-if __name__ == '__main__':
+    app.include_router(prefix="/classifiers", router=router)
 
-    run_all(True, 10, True, dataset_path)
-
+    return app

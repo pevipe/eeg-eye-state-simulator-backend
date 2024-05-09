@@ -4,6 +4,13 @@ from src.application.core.feature_extraction.data_loaders import SingleDatasetLo
 from src.application.core.state_classification.hyperparameter_optimization import SingleOptimizer
 
 
+def make_windows(subject: str, window: int):
+    subject_loc = get_subject_loc(subject)
+    data_loc = get_windowed_subject_loc(subject, window)
+    SingleDatasetLoader(subject_loc, data_loc, window)
+    return SingleDatasetLoader(subject_loc, data_loc, window).dataset
+
+
 def optimize_for_algorithm(subject: str, algorithm: str, window: int):
     if is_optimized_subject_for_algorithm(subject, algorithm, window):
         return "Subject already optimized for the given algorithm and time window."

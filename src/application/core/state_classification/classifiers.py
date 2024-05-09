@@ -161,3 +161,13 @@ class CustomizedClassifiers(AllClassifiers):
 
                 f.write(name + "," + precision_0 + "," + f1_0 + "," + precision_1 + "," + f1_1 + "," + accuracy + "\n")
             f.close()
+
+
+class CustomizedClassifier:
+    def __init__(self, dataset_path, customization_path, output_path):
+        pass
+
+
+class SingleClassifier:
+    def __init__(self, dataset_path, customization_path, output_path):
+        pass
