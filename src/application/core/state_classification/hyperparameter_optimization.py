@@ -11,7 +11,7 @@ from hpsklearn import (svc, decision_tree_classifier, k_neighbors_classifier, ra
 classifier_dict = {
     'AdaBoost': ada_boost_classifier('abc'),
     'DecisionTree': decision_tree_classifier('dtc'),
-    'KNN': k_neighbors_classifier('knc'),
+    'kNN': k_neighbors_classifier('knc'),
     'LDA': linear_discriminant_analysis('lda'),
     'RandomForest': random_forest_classifier('rfc'),
     'QDA': quadratic_discriminant_analysis('qda'),

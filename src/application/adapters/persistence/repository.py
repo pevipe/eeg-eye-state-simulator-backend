@@ -59,7 +59,7 @@ def has_results(subject, algorithm, window=10):
 
 
 def get_results_loc(subject, algorithm, window=10):
-    return os.path.join(base_directory, 'results', subject, f"{window}s", algorithm)
+    return os.path.join(base_directory, 'results', subject, f"{window}s", f"{algorithm}s.csv")
 
 
 def init_subject_routes(subject, window):
@@ -67,3 +67,10 @@ def init_subject_routes(subject, window):
         path = os.path.join(base_directory, folder, subject, f"{window}s")
         if not os.path.exists(path):
             os.makedirs(path)
+
+
+def create_if_not_exists_dir(dir_path):
+    if not os.path.exists(os.path.dirname(dir_path)):
+        os.makedirs(os.path.dirname(dir_path))
+
+

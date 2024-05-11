@@ -35,15 +35,16 @@ def is_optimized_subject(subject: str, algorithm: str, window: int):
     res = is_optimized_subject_for_algorithm(subject, algorithm, window)
     return res
 
-#
-# @router.post("/optimize")
-# async def optimize_subject_algorithm(subject: str, algorithm: str, window: int):
-#     if algorithm not in ['AdaBoost', 'DecisionTree', 'KNN', 'LDA', 'RandomForest', 'QDA', 'SVM']:
-#         return JSONResponse(content={"message": "Algorithm not recognized."}, status_code=400)
-#     else:
-#         m = optimize_for_algorithm(subject, algorithm, window)
-#         return JSONResponse(content={"message": m}, status_code=200)
-#
+
+@router.post("/optimize")
+async def optimize_subject_algorithm(subject: str, algorithm: str, window: int):
+    print("Optimizing subject:", subject, "with algorithm:", algorithm, "and window size:", window)
+    if algorithm not in ['AdaBoost', 'DecisionTree', 'kNN', 'LDA', 'RandomForest', 'QDA', 'SVM']:
+        return JSONResponse(content={"message": "Algorithm not recognized."}, status_code=400)
+    else:
+        m = optimize_for_algorithm(subject, algorithm, window)
+        return JSONResponse(content={"message": m}, status_code=200)
+
 #
 # @router.post("/train")
 # def train_algorithm(subject: str, algorithm: str, window: int, train_set_size: int, use_optimized_hyperparams: bool):
