@@ -29,6 +29,12 @@ async def window_subject(subject: str, window: int):
     make_windows(subject, window)
     return JSONResponse(content={"message": "Subject windowed successfully"}, status_code=200)
 
+
+@router.get("/is_optimized")
+def is_optimized_subject(subject: str, algorithm: str, window: int):
+    res = is_optimized_subject_for_algorithm(subject, algorithm, window)
+    return res
+
 #
 # @router.post("/optimize")
 # async def optimize_subject_algorithm(subject: str, algorithm: str, window: int):
@@ -37,12 +43,6 @@ async def window_subject(subject: str, window: int):
 #     else:
 #         m = optimize_for_algorithm(subject, algorithm, window)
 #         return JSONResponse(content={"message": m}, status_code=200)
-#
-#
-# @router.get("/is-optimized")
-# def is_optimized_subject(subject: str, algorithm: str, window: int):
-#     res = is_optimized_subject_for_algorithm(subject, algorithm, window)
-#     return JSONResponse(content={"is_optimized": res})
 #
 #
 # @router.post("/train")
