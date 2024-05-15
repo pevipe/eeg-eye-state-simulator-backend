@@ -1,9 +1,11 @@
-from fastapi import APIRouter, FastAPI, File, UploadFile
+import json
+
+from fastapi import APIRouter, FastAPI, File, UploadFile, Response
 from fastapi.responses import JSONResponse
 
 from src.application.adapters.persistence.repository import get_loaded_subjects, is_optimized_subject_for_algorithm
 from src.application.adapters.persistence.repository import upload_subject
-from src.application.core.run_algorithms import optimize_for_algorithm, make_windows
+from src.application.core.run_algorithms import optimize_for_algorithm, make_windows, train_algorithm
 
 router = APIRouter(tags=["Classifiers"])
 
@@ -45,7 +47,11 @@ async def optimize_subject_algorithm(subject: str, algorithm: str, window: int):
         m = optimize_for_algorithm(subject, algorithm, window)
         return JSONResponse(content={"message": m}, status_code=200)
 
-#
-# @router.post("/train")
-# def train_algorithm(subject: str, algorithm: str, window: int, train_set_size: int, use_optimized_hyperparams: bool):
-#     return JSONResponse(content={"message": "Not implemented. Coming soon!"}, status_code=501)
+
+@router.post("/train")
+async def train(subject: str, algorithm: str, window: int, train_set_size: int, use_optimized_hyperparams: bool):
+    results = train_algorithm(subject, algorithm, window, train_set_size, use_optimized_hyperparams)
+    results['real_tags_in_test'] = results['real_tags_in_test'].tolist()
+    results['predicted_tags_in_test'] = results['predicted_tags_in_test'].tolist()
+
+    return Response(content=json.dumps(results), media_type="application/json")

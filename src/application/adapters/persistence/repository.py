@@ -42,6 +42,10 @@ def get_windowed_subject_loc(subject, window):
     return os.path.join(base_directory, 'datasets', subject, f"{window}s.csv")
 
 
+def get_exact_window_index_loc(subject, window):
+    return os.path.join(base_directory, 'datasets', subject, f"{window}s_exact_indexes.csv")
+
+
 def is_optimized_subject_for_algorithm(subject, algorithm, window=10):
     return os.path.exists(os.path.join(base_directory, 'hyperparams', subject, f"{window}s", f"{algorithm}.csv"))
 
@@ -58,8 +62,8 @@ def has_results(subject, algorithm, window=10):
     return os.path.exists(os.path.join(base_directory, 'results', subject, f"{window}s", algorithm))
 
 
-def get_results_loc(subject, algorithm, window=10):
-    return os.path.join(base_directory, 'results', subject, f"{window}s", f"{algorithm}s.csv")
+def get_results_loc(subject, algorithm, indiv, window=10):
+    return os.path.join(base_directory, 'results', subject, f"{'individual' if indiv else 'collective'}", f"{window}s", f"{algorithm}.csv")
 
 
 def init_subject_routes(subject, window):

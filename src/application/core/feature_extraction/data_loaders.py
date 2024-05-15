@@ -203,12 +203,17 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
 
 
 class SingleDatasetLoader(ProvidedDatasetIndividualLoader):
-    def __init__(self, dataset_path, output_path, win_size, fs=200):
+    def __init__(self, dataset_path, output_path, win_size, exact_windows_path, fs=200):
         super().__init__(dataset_path, output_path, fs, win_size)
-        self.load_a_dataset()
+        self.exact_windows_indexes = None
+        # self.exact_windows_path = output_path[:-4] + "exact_indexes.csv"
+        self.exact_windows_path = exact_windows_path
+        self.overlap = self.window_size - 2
+        self.load_a_dataset(self.overlap)
+        self.get_exact_windows_idx(self.overlap)
         self.export_dataset()
 
-    def load_a_dataset(self, overlap=0, pure_windows=False):
+    def load_a_dataset(self, overlap, pure_windows=False):
         self.dataset = None  # Clear the dataset in case it contained something
 
         if os.path.exists(self.output_path):
@@ -245,3 +250,28 @@ class SingleDatasetLoader(ProvidedDatasetIndividualLoader):
         if os.path.exists(self.output_path):
             return
         np.savetxt(self.output_path, self.dataset, delimiter=",")
+
+    def get_exact_windows_idx(self, overlap):
+        self.exact_windows_indexes = []  # Clear the dataset in case it contained something
+
+        if os.path.exists(self.exact_windows_path):
+            # load the dataset from the output path
+            self.exact_windows_indexes = np.loadtxt(open(self.exact_windows_path, "rb"), delimiter=",")
+            return self.exact_windows_indexes
+
+        # Load the individual subject specified
+        data = ProvidedDatasetLoader._load_csv(self.dataset_path)
+
+        # Take the samples with overlapping (sliding time window each 2 seconds)
+        total_time = 600
+        windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
+
+        for i, w in enumerate(windows):
+            if 0 < w.mean_targets < 1:  # Window does not contain unique state
+                pass
+            else:
+                self.exact_windows_indexes.append(i)
+
+        np.savetxt(self.exact_windows_path, self.exact_windows_indexes, delimiter=",")
+
+        return self.exact_windows_indexes
