@@ -13,8 +13,7 @@ def get_routes(ty, individual, win_size, pure_windows):
         if individual:
             return f"../out/{ty}/individual/{win_size}s/{'pure_windows' if pure_windows else 'all_windows'}"
         else:
-            if pure_windows:
-                return f"../out/{ty}/collective/{win_size}s/{'pure_windows' if pure_windows else 'all_windows'}"
+            return f"../out/{ty}/collective/{win_size}s/{'pure_windows' if pure_windows else 'all_windows'}"
     else:
         raise Exception("Invalid type. It must be one of the following: 'results', 'hyperparams', 'datasets'")
 
@@ -150,6 +149,7 @@ def transform_results(folder_path, pure_windows):
 def run_all(individual, win_size, pure_windows, dataset_input_path, n_subject=None):
     if not individual and n_subject is not None:
         raise Exception("If 'individual' is False, then a single subject cannot be selected")
+
     # Get the output paths
     hyperparams_output_path = get_routes('hyperparams', individual, win_size, pure_windows)
     result_output_path = get_routes('results', individual, win_size, pure_windows)

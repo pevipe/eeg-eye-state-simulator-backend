@@ -6,15 +6,16 @@ name = "pypi"
 [packages]
 numpy = "~=1.26.0"
 matplotlib = "~=3.8.0"
-scipy = "~=1.11.3"
+scipy = "=1.11.3"
+wheel = "*"
+setuptools = "*"
 scikit-learn = "~=1.3.2"
 pandas = "~=2.2.1"
 hyperopt = "~=0.2.7"
 seaborn = "~=0.13.2"
 fastapi = "~=0.110.3"
 uvicorn = "~=0.29.0"
-hpsklearn = {git = "git+https://github.com/hyperopt/hyperopt-sklearn"}
-setuptools = "*"
+hpsklearn = {git = "git+https://github.com/hyperopt/hyperopt-sklearn.git", ref="master"}
 python-multipart = "*"
 
 [dev-packages]
