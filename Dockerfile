@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir pipenv
 RUN pipenv install
 
 COPY . .
+RUN unzip /app/eeg-persistence.zip -d /app
 
 CMD ["pipenv", "run", "uvicorn", "src.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
 
