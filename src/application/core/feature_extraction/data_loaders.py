@@ -75,33 +75,6 @@ class ProvidedDatasetLoader(DataLoader):
         return self.dataset
 
 
-class DHBWDatasetLoader(DataLoader):
-    def __init__(self, dataset_path, fs, win_size, total_time):
-        super().__init__(dataset_path, fs, win_size)
-        self.dataset = None
-        self.total_time = total_time
-
-    @staticmethod
-    def _load_csv(file):
-        data = np.genfromtxt(file, delimiter=",", skip_header=1)
-        data = data[:, [6, 7, 14]]
-        return data
-
-    def load_dataset(self, normalize=False):
-        data = DHBWDatasetLoader._load_csv(self.dataset_path)
-        if normalize:
-            data = self._normalize(data)
-
-        windows = self._all_windowing(data, self.total_time, self.window_size, self.fs)
-
-        dataset = []
-        for w in windows:
-            dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry())
-        self.dataset = np.array(dataset)
-        return self.dataset
-
-
 class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
     def __init__(self, dataset_path, output_path, fs, win_size):
         super().__init__(dataset_path, fs, win_size)
