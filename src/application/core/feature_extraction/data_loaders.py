@@ -3,12 +3,10 @@ import os
 
 from src.application.core.feature_extraction.ratio import Ratio
 from src.application.core.feature_extraction.window import Window
-from src.application.core.feature_extraction.constants import alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
 
 
 class DataLoader:
-    def __init__(self, dataset_path, fs, win_size, alpha_lowcut=alpha_lowcut, alpha_highcut=alpha_highcut,
-                 beta_lowcut=beta_lowcut, beta_highcut=beta_highcut):
+    def __init__(self, dataset_path, fs, win_size):
         self.dataset_path = dataset_path
         self.fs = fs
         self.window_size = win_size
@@ -16,10 +14,10 @@ class DataLoader:
         #############
         # Constants #
         #############
-        self.alpha_lowcut = alpha_lowcut
-        self.alpha_highcut = alpha_highcut
-        self.beta_lowcut = beta_lowcut
-        self.beta_highcut = beta_highcut
+        self.alpha_lowcut = 7.0
+        self.alpha_highcut = 12.0
+        self.beta_lowcut = 14.0
+        self.beta_highcut = 25.0
         self.dataset = None
 
     @staticmethod
