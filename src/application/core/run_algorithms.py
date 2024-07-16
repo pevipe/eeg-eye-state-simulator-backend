@@ -1,7 +1,7 @@
 from src.application.adapters.persistence.repository import get_subject_loc, get_windowed_subject_loc, \
     get_optimized_general_loc, get_results_loc, is_optimized_subject_for_algorithm, create_if_not_exists_dir, \
     get_optimized_for_subject_and_algorithm_loc, is_windowed, get_exact_window_index_loc
-from src.application.core.feature_extraction.data_loaders import DataLoader
+from src.application.core.feature_extraction.data_loader import DataLoader
 from src.application.core.state_classification.classifiers import CustomizedClassifier
 from src.application.core.state_classification.hyperparameter_optimization import SingleOptimizer
 
