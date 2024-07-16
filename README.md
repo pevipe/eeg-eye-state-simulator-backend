@@ -68,3 +68,6 @@ Note that, for it to work properly, the image with the backend of the applicatio
 The API documentation will be available at `http://localhost:8000/docs` when running the application.
 It includes the endpoints, and their parameters. Moreover, it allows to test the endpoints directly
 from the browser, manually entering the parameters to see the expected outcomes.
+
+![Swagger](https://github.com/user-attachments/assets/5aac97cb-933d-4a03-b045-d4ab18763959)
+
