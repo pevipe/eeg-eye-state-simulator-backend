@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-from src.application.core.feature_extraction.rates import Rate
+from src.application.core.feature_extraction.ratio import Ratio
 from src.application.core.feature_extraction.window import Window
 from src.application.core.feature_extraction.constants import alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut
 
@@ -69,9 +69,9 @@ class ProvidedDatasetLoader(DataLoader):
                 if 0 < w.mean_targets < 1:
                     pass
                 else:
-                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                                         self.fs).to_classificator_entry())
-            dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+            dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                                 self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
         return self.dataset
@@ -98,7 +98,7 @@ class DHBWDatasetLoader(DataLoader):
 
         dataset = []
         for w in windows:
-            dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+            dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                                 self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
         return self.dataset
@@ -145,12 +145,12 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
                     if 0 < w.mean_targets < 1:  # Window does not contain unique state
                         pass
                     else:
-                        dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                        dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
                                             self.beta_highcut, self.fs).to_classificator_entry())
                 self.dataset.append(np.array(dataset))
             else:
                 for w in windows:
-                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                                         self.fs).to_classificator_entry())
                 self.dataset.append(np.array(dataset))
 
@@ -177,12 +177,12 @@ class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
                 if 0 < w.mean_targets < 1:  # Window does not contain unique state
                     pass
                 else:
-                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
                                         self.beta_highcut, self.fs).to_classificator_entry())
         else:
             for w in windows:
                 dataset.append(
-                    Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                    Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                          self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
 
@@ -234,12 +234,12 @@ class SingleDatasetLoader(ProvidedDatasetIndividualLoader):
                 if 0 < w.mean_targets < 1:  # Window does not contain unique state
                     pass
                 else:
-                    dataset.append(Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
+                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
                                         self.beta_highcut, self.fs).to_classificator_entry())
         else:
             for w in windows:
                 dataset.append(
-                    Rate(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                    Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
                          self.fs).to_classificator_entry())
         self.dataset = np.array(dataset)
 
