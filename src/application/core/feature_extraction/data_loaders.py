@@ -6,10 +6,13 @@ from src.application.core.feature_extraction.window import Window
 
 
 class DataLoader:
-    def __init__(self, dataset_path, fs, win_size):
+    def __init__(self, dataset_path: str, output_path: str, win_size: int, exact_windows_path: str, fs: int = 200) -> object:
         self.dataset_path = dataset_path
-        self.fs = fs
+        self.output_path = output_path
         self.window_size = win_size
+        self.overlap = self.window_size - 2
+        self.exact_windows_path = exact_windows_path
+        self.fs = fs
 
         #############
         # Constants #
@@ -18,15 +21,31 @@ class DataLoader:
         self.alpha_highcut = 12.0
         self.beta_lowcut = 14.0
         self.beta_highcut = 25.0
+        self.total_time = 600  # 10 minutes
+
+        #############################
+        # Attribute initializations #
+        #############################
         self.dataset = None
+        self.exact_windows_indexes = None
+
+        #####################
+        # Method invocation #
+        #####################
+        self.load_a_dataset()  # Load the dataset and exact window indexes
+        self.export_dataset()  # Export the data so it can be used next time
 
     @staticmethod
-    def _normalize(unnormalized_data):
-        normalized = unnormalized_data[:, 0:2] - np.mean(unnormalized_data[:, 0:2])
-        return np.append(normalized, unnormalized_data[:, 2].reshape(-1, 1), axis=1)
-
-    @staticmethod
-    def _all_windowing(total_data, total_time, win_size, fs, overlap=0):
+    def _all_windowing(total_data: np.ndarray, total_time: int, win_size: int, fs: int, overlap: int = 0) -> list[Window]:
+        """
+        Window the given data, creating a list of Window objects.
+        :param total_data: array with the data. Each row is a sample, and the columns are [signal_o1, signal_o2, target]
+        :param total_time: total recorded time, in seconds
+        :param win_size: size of the time window
+        :param fs: frequency of sampling (samples per second)
+        :param overlap: overlap between time windows
+        :return: list of Window objects
+        """
         windows_list = []
         start_time = 0
         end_time = win_size
@@ -38,211 +57,60 @@ class DataLoader:
 
         return windows_list
 
-
-class ProvidedDatasetLoader(DataLoader):
-    def __init__(self, dataset_path, fs, win_size):
-        super().__init__(dataset_path, fs, win_size)
-        self.dataset = None
-
     @staticmethod
-    def _load_csv(file):
+    def _load_csv(file: str) -> np.ndarray:
+        """
+        Load a CSV file with the specified format (timestamp;signal_o1;singal_o2;target) into an array with the data
+        :param file: path to the csv file
+        :return: the data, in an array with columns [signal_o1, signal_o2, target] and a sample per row
+        """
         data = np.loadtxt(open(file, "rb"), delimiter=",")
         data = data[:, 1:4]
         return data
 
-    def load_dataset(self, overlap=0, normalize=False, pure_windows=False):
-        files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
-
-        windows = []
-        for f in files:
-            data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
-            if normalize:
-                data = self._normalize(data)
-            total_time = 600
-            windows = windows + self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
-
-        dataset = []
-        for w in windows:
-            if pure_windows:
-                if 0 < w.mean_targets < 1:
-                    pass
-                else:
-                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                        self.fs).to_classificator_entry())
-            dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                self.fs).to_classificator_entry())
-        self.dataset = np.array(dataset)
-        return self.dataset
-
-
-class ProvidedDatasetIndividualLoader(ProvidedDatasetLoader):
-    def __init__(self, dataset_path, output_path, fs, win_size):
-        super().__init__(dataset_path, fs, win_size)
+    def load_a_dataset(self):
+        """
+        Load a dataset from a CSV file and window it and obtain the ratios.
+        Convert csv into the input of the classifiers -> columns [ratio_o1, ratio_o1, target] and a window per row
+        """
+        # Clear the dataset in case it contained something
         self.dataset = None
-        self.output_path = output_path
+        self.exact_windows_indexes = []
 
-    def load_all_datasets(self, overlap=0, normalize=False, pure_windows=False):
-        """
-            Load the datasets from each individual subject. Returns the list with the datasets.
-            Windowing is now done with the overlapping specified as parameter.
-        """
-        self.dataset = []  # Clear the dataset in case it contained something
-        files = [f for f in os.listdir(self.dataset_path) if f.endswith(".csv")]
-
-        # Check if the datasets have already been calculated
+        # If the dataset had been previously loaded and saved -> load from the output path
         if os.path.exists(self.output_path):
-            out_files = [f for f in os.listdir(self.output_path) if f.endswith(".csv")]
-            if len(out_files) == len(files):
-                # Load the dataset that had already been calculated
-                for f in out_files:
-                    self.dataset.append(np.loadtxt(open(self.output_path + "/" + f, "rb"), delimiter=","))
-                print("Datasets loaded from the output path.")
-                return self.dataset
-        else:
-            os.makedirs(self.output_path)
-
-        # If not, calculate the datasets and export them so then can be imported later
-        for f in files:
-            data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/" + f)
-            if normalize:
-                data = self._normalize(data)
-            # Take the samples with overlapping (sliding time window each 2 seconds)
-            total_time = 600
-            windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
-
-            dataset = []
-            if pure_windows:
-                for w in windows:
-                    if 0 < w.mean_targets < 1:  # Window does not contain unique state
-                        pass
-                    else:
-                        dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
-                                            self.beta_highcut, self.fs).to_classificator_entry())
-                self.dataset.append(np.array(dataset))
-            else:
-                for w in windows:
-                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                                        self.fs).to_classificator_entry())
-                self.dataset.append(np.array(dataset))
-
-        # Export the datasets so that time can be saved next time
-        self.export_datasets()
-
-        return self.dataset
-
-    def load_single_dataset(self, subject_number, overlap=0, normalize=False, pure_windows=False):
-        self.dataset = None  # Clear the dataset in case it contained something
-
-        # Load the individual subject specified
-        data = ProvidedDatasetLoader._load_csv(self.dataset_path + "/Sujeto_" + str(subject_number) + ".csv")
-        if normalize:
-            data = self._normalize(data)
-
-        # Take the samples with overlapping (sliding time window each 2 seconds)
-        total_time = 600
-        windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
-
-        dataset = []
-        if pure_windows:
-            for w in windows:
-                if 0 < w.mean_targets < 1:  # Window does not contain unique state
-                    pass
-                else:
-                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
-                                        self.beta_highcut, self.fs).to_classificator_entry())
-        else:
-            for w in windows:
-                dataset.append(
-                    Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                         self.fs).to_classificator_entry())
-        self.dataset = np.array(dataset)
-
-        return self.dataset
-
-    def export_datasets(self, route=None):
-        if route is None:
-            route = self.output_path
-        # Create the directory if it does not exist
-        if not os.path.exists(route):
-            os.makedirs(route)
-
-        # Save the dataset to CSV files
-        for i, dataset in enumerate(self.dataset):
-            np.savetxt(route + "/subject_" + str(i + 1) + ".csv", dataset, delimiter=",")
-
-        print("Datasets exported to the output path.")
-
-
-class SingleDatasetLoader(ProvidedDatasetIndividualLoader):
-    def __init__(self, dataset_path, output_path, win_size, exact_windows_path, fs=200):
-        super().__init__(dataset_path, output_path, fs, win_size)
-        self.exact_windows_indexes = None
-        # self.exact_windows_path = output_path[:-4] + "exact_indexes.csv"
-        self.exact_windows_path = exact_windows_path
-        self.overlap = self.window_size - 2
-        self.load_a_dataset(self.overlap)
-        self.get_exact_windows_idx(self.overlap)
-        self.export_dataset()
-
-    def load_a_dataset(self, overlap, pure_windows=False):
-        self.dataset = None  # Clear the dataset in case it contained something
-
-        if os.path.exists(self.output_path):
-            # load the dataset from the output path
             self.dataset = np.loadtxt(open(self.output_path, "rb"), delimiter=",")
-            return self.dataset
-
-        # Load the individual subject specified
-        data = ProvidedDatasetLoader._load_csv(self.dataset_path)
-
-        # Take the samples with overlapping (sliding time window each 2 seconds)
-        total_time = 600
-        windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
-
-        dataset = []
-        if pure_windows:
-            for w in windows:
-                if 0 < w.mean_targets < 1:  # Window does not contain unique state
-                    pass
-                else:
-                    dataset.append(Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut,
-                                        self.beta_highcut, self.fs).to_classificator_entry())
-        else:
-            for w in windows:
-                dataset.append(
-                    Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
-                         self.fs).to_classificator_entry())
-        self.dataset = np.array(dataset)
-
-        return self.dataset
-
-    def export_dataset(self):
-        # Save the dataset to CSV
-        if os.path.exists(self.output_path):
-            return
-        np.savetxt(self.output_path, self.dataset, delimiter=",")
-
-    def get_exact_windows_idx(self, overlap):
-        self.exact_windows_indexes = []  # Clear the dataset in case it contained something
 
         if os.path.exists(self.exact_windows_path):
             # load the dataset from the output path
             self.exact_windows_indexes = np.loadtxt(open(self.exact_windows_path, "rb"), delimiter=",")
-            return self.exact_windows_indexes
+
+        if self.dataset is not None and self.exact_windows_indexes != []:
+            return
 
         # Load the individual subject specified
-        data = ProvidedDatasetLoader._load_csv(self.dataset_path)
+        data = self._load_csv(self.dataset_path)
 
         # Take the samples with overlapping (sliding time window each 2 seconds)
-        total_time = 600
-        windows = self._all_windowing(data, total_time, self.window_size, self.fs, overlap=overlap)
+        windows = self._all_windowing(data, self.total_time, self.window_size, self.fs, overlap=self.overlap)
 
+        dataset = []
         for i, w in enumerate(windows):
+            dataset.append(
+                Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
+                      self.fs).to_classificator_entry())
             if 0 < w.mean_targets < 1:  # Window does not contain unique state
                 pass
             else:
                 self.exact_windows_indexes.append(i)
 
-        np.savetxt(self.exact_windows_path, self.exact_windows_indexes, delimiter=",")
+        self.dataset = np.array(dataset)
 
-        return self.exact_windows_indexes
+    def export_dataset(self):
+        """
+        Save the dataset and exact windows indexes to a CSV file
+        """
+        if not os.path.exists(self.output_path):
+            np.savetxt(self.output_path, self.dataset, delimiter=",")
+        if not os.path.exists(self.exact_windows_path):
+            np.savetxt(self.exact_windows_path, self.exact_windows_indexes, delimiter=",")
