@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Window:
-    def __init__(self, global_data, start_time, end_time, fs):
+    def __init__(self, global_data: np.ndarray, start_time: int, end_time: int, fs: int) -> object:
         # Defining the start and end time for the window (seconds)
         self.start_time = start_time
         self.end_time = end_time
@@ -16,13 +16,13 @@ class Window:
         self.data_O2 = self.windowing(global_data[:, 1])
         self.mean_targets = np.mean(targets)
 
-    def windowing(self, data):
+    def windowing(self, data: np.ndarray) -> np.ndarray:
         ini = self.start_time * self.fs
         fin = self.end_time * self.fs
 
         return data[ini:fin]
 
-    def __str__(self):
+    def __str__(self) -> str:
         mean_O1 = str(round(np.mean(self.data_O1), 4))
         mean_O2 = str(round(np.mean(self.data_O2), 4))
         mean_targets = str(round(self.mean_targets, 2))

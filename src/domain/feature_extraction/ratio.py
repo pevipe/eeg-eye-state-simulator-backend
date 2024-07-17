@@ -4,7 +4,7 @@ from scipy.signal import butter, sosfilt
 from src.domain.feature_extraction.window import Window
 
 
-def _butter_bandpass(lowcut, highcut, fs, order=5):
+def _butter_bandpass(lowcut: float, highcut: float, fs: int, order: int = 5) -> tuple:
     nyq = 0.5 * fs
     low = lowcut / nyq
     high = highcut / nyq
@@ -12,13 +12,13 @@ def _butter_bandpass(lowcut, highcut, fs, order=5):
     return sos
 
 
-def _butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+def _butter_bandpass_filter(data: np.ndarray, lowcut: float, highcut: float, fs: int, order: int = 5) -> np.ndarray:
     sos = _butter_bandpass(lowcut, highcut, fs, order=order)
     y = sosfilt(sos, data)
     return y
 
 
-def _calculate_ratio(signal_1, signal_2):
+def _calculate_ratio(signal_1: np.ndarray, signal_2: np.ndarray) -> float:
     pot_s1 = np.mean(np.power(signal_1, 2))
     pot_s2 = np.mean(np.power(signal_2, 2))
 
@@ -28,7 +28,8 @@ def _calculate_ratio(signal_1, signal_2):
 
 
 class Ratio:
-    def __init__(self, window: Window, alpha_lowcut, alpha_highcut, beta_lowcut, beta_highcut, fs):
+    def __init__(self, window: Window, alpha_lowcut: float, alpha_highcut: float,
+                 beta_lowcut: float, beta_highcut: float, fs: int) -> object:
         self.window = window
 
         # 1. Apply butter bandpass filter
@@ -41,11 +42,15 @@ class Ratio:
         self.ratio_O1 = _calculate_ratio(alpha_o1, alpha_o2)
         self.ratio_O2 = _calculate_ratio(beta_o1, beta_o2)
 
-    def __str__(self):
+    def __str__(self) -> str:
         o1 = str(round(self.ratio_O1, 3))
         o2 = str(round(self.ratio_O2, 3))
         return ("Ratios for window on period " + str(self.window.start_time) + "s to " + str(self.window.end_time) +
                 "s is: O1 = " + o1 + ", O2 = " + o2)
 
-    def to_classificator_entry(self):
+    def to_classificator_entry(self) -> list:
+        """
+        Obtain the list that conforms the classificator entry for the time window.
+        :return: list with ratio in each of the sensors and label associated to it.
+        """
         return [self.ratio_O1, self.ratio_O2, np.rint(self.window.mean_targets)]
