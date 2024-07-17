@@ -1,8 +1,8 @@
 import numpy as np
 import os
 
-from src.application.core.feature_extraction.ratio import Ratio
-from src.application.core.feature_extraction.window import Window
+from src.domain.feature_extraction.ratio import Ratio
+from src.domain.feature_extraction.window import Window
 
 
 class DataLoader:

@@ -1,11 +1,11 @@
 import json
 
-from fastapi import APIRouter, FastAPI, File, UploadFile, Response
+from fastapi import APIRouter, File, UploadFile, Response
 from fastapi.responses import JSONResponse
 
-from src.application.adapters.persistence.repository import get_loaded_subjects, is_optimized_subject_for_algorithm
-from src.application.adapters.persistence.repository import upload_subject
-from src.application.core.run_algorithms import optimize_for_algorithm, make_windows, train_algorithm
+from src.adapters.persistence.repository import get_loaded_subjects, is_optimized_subject_for_algorithm
+from src.adapters.persistence.repository import upload_subject
+from src.application.usecases import optimize_for_algorithm, make_windows, train_algorithm
 
 router = APIRouter(tags=["Classifiers"])
 
