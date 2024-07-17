@@ -75,7 +75,7 @@ class DataLoader:
         """
         # Clear the dataset in case it contained something
         self.dataset = None
-        self.exact_windows_indexes = []
+        self.exact_windows_indexes = None
 
         # If the dataset had been previously loaded and saved -> load from the output path
         if os.path.exists(self.output_path):
@@ -85,7 +85,7 @@ class DataLoader:
             # load the dataset from the output path
             self.exact_windows_indexes = np.loadtxt(open(self.exact_windows_path, "rb"), delimiter=",")
 
-        if self.dataset is not None and self.exact_windows_indexes != []:
+        if self.dataset is not None and self.exact_windows_indexes is not None:
             return
 
         # Load the individual subject specified
@@ -95,6 +95,7 @@ class DataLoader:
         windows = self._all_windowing(data, self.total_time, self.window_size, self.fs, overlap=self.overlap)
 
         dataset = []
+        self.exact_windows_indexes = []
         for i, w in enumerate(windows):
             dataset.append(
                 Ratio(w, self.alpha_lowcut, self.alpha_highcut, self.beta_lowcut, self.beta_highcut,
