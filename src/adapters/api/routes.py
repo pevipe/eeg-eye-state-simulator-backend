@@ -22,7 +22,6 @@ async def upload_dataset(file: UploadFile = File(...)):
     print("Uploading subject:", name)
     content = await file.read()
     return upload_subject(name, content)
-    # return JSONResponse(content={"message": m}, status_code=200)
 
 
 @router.post("/window_subject")
