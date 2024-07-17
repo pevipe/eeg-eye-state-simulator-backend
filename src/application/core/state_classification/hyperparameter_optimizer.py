@@ -1,5 +1,5 @@
 import shutil
-
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from hpsklearn import HyperoptEstimator, any_preprocessing, quadratic_discriminant_analysis
@@ -18,16 +18,21 @@ classifier_dict = {
 }
 
 
-class SingleOptimizer:
-    def __init__(self, dataset, classifier, general_optimization_loc, output_path):
+class HyperparameterOptimizer:
+    def __init__(self, dataset: np.ndarray, classifier: str, general_optimization_loc: str, output_path: str) -> object:
         self.dataset = dataset
         self.classifier = classifier
         self.general_loc = general_optimization_loc
         self.output_path = output_path
+
         self.model = self.optimize()
         self.save_results()
 
-    def optimize(self):
+    def optimize(self) -> dict | None:
+        """
+        Obtain the optimization parameters and preprocessor based on the string that identifies the algorithm.
+        :return: dict with the best preprocessor and model of classification algorithm (with hyperparameters).
+        """
         x = self.dataset[:, 0:2].astype('float32')
         y = LabelEncoder().fit_transform(self.dataset[:, 2].astype('str'))
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=1)
@@ -46,6 +51,9 @@ class SingleOptimizer:
             return None
 
     def save_results(self):
+        """
+        Save the results in the configured path.
+        """
         if self.model is None:
             shutil.copyfile(self.general_loc, self.output_path)
         else:

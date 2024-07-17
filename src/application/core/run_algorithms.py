@@ -3,7 +3,7 @@ from src.application.adapters.persistence.repository import get_subject_loc, get
     get_optimized_for_subject_and_algorithm_loc, is_windowed, get_exact_window_index_loc
 from src.application.core.feature_extraction.data_loader import DataLoader
 from src.application.core.state_classification.classifiers import CustomizedClassifier
-from src.application.core.state_classification.hyperparameter_optimization import SingleOptimizer
+from src.application.core.state_classification.hyperparameter_optimizer import HyperparameterOptimizer
 
 
 def make_windows(subject: str, window: int):
@@ -29,7 +29,7 @@ def optimize_for_algorithm(subject: str, algorithm: str, window: int):
     data = DataLoader(subject_loc, data_loc, window, exact_index_loc).dataset
 
     # optimize the algorithm
-    SingleOptimizer(data, algorithm, general_opt_loc, hyperparams_output_loc)
+    HyperparameterOptimizer(data, algorithm, general_opt_loc, hyperparams_output_loc)
 
     return "Subject optimized successfully."
 
