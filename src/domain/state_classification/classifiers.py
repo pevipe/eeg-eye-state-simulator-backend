@@ -20,7 +20,7 @@ from sklearn.metrics import precision_score, accuracy_score
 
 class CustomizedClassifier:
     def __init__(self, dataset_path: str, customization_path: str,
-                 output_path: str, exact_index_path: str, train_set_size: int) -> object:
+                 output_path: str, exact_index_path: str, train_set_size: int) -> None:
         # Init variables
         self.total_accuracy, self.precision_opened, self.precision_closed = None, None, None
         self.X_train, self.X_test, self.y_train, self.y_test = None, None, None, None

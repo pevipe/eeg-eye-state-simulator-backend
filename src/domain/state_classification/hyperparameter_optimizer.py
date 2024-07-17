@@ -19,7 +19,7 @@ classifier_dict = {
 
 
 class HyperparameterOptimizer:
-    def __init__(self, dataset: np.ndarray, classifier: str, general_optimization_loc: str, output_path: str) -> object:
+    def __init__(self, dataset: np.ndarray, classifier: str, general_optimization_loc: str, output_path: str) -> None:
         self.dataset = dataset
         self.classifier = classifier
         self.general_loc = general_optimization_loc

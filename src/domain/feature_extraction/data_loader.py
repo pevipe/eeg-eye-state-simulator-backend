@@ -6,7 +6,8 @@ from src.domain.feature_extraction.window import Window
 
 
 class DataLoader:
-    def __init__(self, dataset_path: str, output_path: str, win_size: int, exact_windows_path: str, fs: int = 200) -> object:
+    def __init__(self, dataset_path: str, output_path: str, win_size: int,
+                 exact_windows_path: str, fs: int = 200) -> None:
         self.dataset_path = dataset_path
         self.output_path = output_path
         self.window_size = win_size

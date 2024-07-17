@@ -29,7 +29,7 @@ def _calculate_ratio(signal_1: np.ndarray, signal_2: np.ndarray) -> float:
 
 class Ratio:
     def __init__(self, window: Window, alpha_lowcut: float, alpha_highcut: float,
-                 beta_lowcut: float, beta_highcut: float, fs: int) -> object:
+                 beta_lowcut: float, beta_highcut: float, fs: int) -> None:
         self.window = window
 
         # 1. Apply butter bandpass filter

@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Window:
-    def __init__(self, global_data: np.ndarray, start_time: int, end_time: int, fs: int) -> object:
+    def __init__(self, global_data: np.ndarray, start_time: int, end_time: int, fs: int) -> None:
         # Defining the start and end time for the window (seconds)
         self.start_time = start_time
         self.end_time = end_time
