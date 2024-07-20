@@ -1,16 +1,16 @@
-from src.application.adapters.persistence.repository import get_subject_loc, get_windowed_subject_loc, \
+from src.adapters.persistence.repository import get_subject_loc, get_windowed_subject_loc, \
     get_optimized_general_loc, get_results_loc, is_optimized_subject_for_algorithm, create_if_not_exists_dir, \
     get_optimized_for_subject_and_algorithm_loc, is_windowed, get_exact_window_index_loc
-from src.application.core.feature_extraction.data_loaders import SingleDatasetLoader
-from src.application.core.state_classification.classifiers import CustomizedClassifier
-from src.application.core.state_classification.hyperparameter_optimization import SingleOptimizer
+from src.domain.feature_extraction.data_loader import DataLoader
+from src.domain.state_classification.classifiers import CustomizedClassifier
+from src.domain.state_classification.hyperparameter_optimizer import HyperparameterOptimizer
 
 
 def make_windows(subject: str, window: int):
     subject_loc = get_subject_loc(subject)
     out_window_loc = get_windowed_subject_loc(subject, window)
     exact_index_loc = get_exact_window_index_loc(subject, window)
-    return SingleDatasetLoader(subject_loc, out_window_loc, window, exact_index_loc).dataset
+    return DataLoader(subject_loc, out_window_loc, window, exact_index_loc).dataset
 
 
 def optimize_for_algorithm(subject: str, algorithm: str, window: int):
@@ -26,10 +26,10 @@ def optimize_for_algorithm(subject: str, algorithm: str, window: int):
     create_if_not_exists_dir(hyperparams_output_loc)
 
     # window the data and save it in data_loc
-    data = SingleDatasetLoader(subject_loc, data_loc, window, exact_index_loc).dataset
+    data = DataLoader(subject_loc, data_loc, window, exact_index_loc).dataset
 
     # optimize the algorithm
-    SingleOptimizer(data, algorithm, general_opt_loc, hyperparams_output_loc)
+    HyperparameterOptimizer(data, algorithm, general_opt_loc, hyperparams_output_loc)
 
     return "Subject optimized successfully."
 
