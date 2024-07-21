@@ -69,7 +69,7 @@ directory of the project.
 ### Run the Docker image
 Once the image has been built, it can be run with `docker run -p 8000:8000 <image_name:latest>`,
 and the API will be available at `http://localhost:8000`. To see the frontend of the application, 
-follow [these instructions](https://github.com/pevipe/TFG_frontend/blob/main/README.md#run-the-project).
+follow [these instructions](https://github.com/pevipe/eeg-eye-state-simulator-frontend?tab=readme-ov-file#run-the-project).
 
 Note that, for it to work properly, the image with the backend of the application (available 
 [here](https://github.com/pevipe/eeg-eye-state-simulator-backend)) must also be built and running.
@@ -79,5 +79,4 @@ The API documentation will be available at `http://localhost:8000/docs` when run
 It includes the endpoints, and their parameters. Moreover, it allows to test the endpoints directly
 from the browser, manually entering the parameters to see the expected outcomes.
 
-![Swagger](https://github.com/user-attachments/assets/5aac97cb-933d-4a03-b045-d4ab18763959)
-
+![Swagger](https://github.com/user-attachments/assets/bcaac5f2-5c19-47fe-8004-3499ea92bf1e)
