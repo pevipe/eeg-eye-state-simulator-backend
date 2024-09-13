@@ -1,3 +1,10 @@
+# Copyright 2024 Pelayo Vieites Pérez
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+
 from src.adapters.persistence.repository import get_subject_loc, get_windowed_subject_loc, \
     get_optimized_general_loc, get_results_loc, is_optimized_subject_for_algorithm, create_if_not_exists_dir, \
     get_optimized_for_subject_and_algorithm_loc, is_windowed, get_exact_window_index_loc
